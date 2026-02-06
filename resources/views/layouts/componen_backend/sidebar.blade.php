@@ -33,13 +33,13 @@
         <div id="collapseUsers"
              class="collapse {{ request()->is('admin/authors*') || request()->is('admin/readers*') ? 'show' : '' }}">
             <div class="bg-white py-2 collapse-inner rounded">
+                 <a class="collapse-item {{ request()->routeIs('admin.reader.index') ? 'active' : '' }}"
+                   href="{{ route('admin.reader.index') }}">
+                    Reader
+                </a>
                 <a class="collapse-item {{ request()->routeIs('admin.author.index') ? 'active' : '' }}"
                    href="{{ route('admin.author.index') }}">
                     Author
-                </a>
-                <a class="collapse-item {{ request()->routeIs('admin.reader.index') ? 'active' : '' }}"
-                   href="{{ route('admin.reader.index') }}">
-                    Reader
                 </a>
             </div>
         </div>

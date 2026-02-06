@@ -49,7 +49,7 @@
                                 Pengajuan Pending
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ \App\Models\User::where('role', 'reader')->where('author_request', 'pending')->count() }}
+                                {{ \App\Models\User::where('role', 'user')->where('author_request', 'pending')->count() }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -69,7 +69,7 @@
                                 Reader Aktif
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ \App\Models\User::where('role', 'reader')->where('is_active', true)->count() }}
+                                {{ \App\Models\User::where('role', 'user')->where('is_active', true)->count() }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -89,7 +89,7 @@
                                 Reader Diblokir
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ \App\Models\User::where('role', 'reader')->where('is_active', false)->count() }}
+                                {{ \App\Models\User::where('role', 'user')->where('is_active', false)->count() }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -126,14 +126,14 @@
                 <table class="table table-bordered table-hover" id="dataTable">
                     <thead class="thead-light">
                         <tr>
-                            <th width="50">#</th>
+                            <th width="50">No</th>
                             <th>Nama</th>
                             <th>Email</th>
-                            <th width="120">Total Baca</th>
-                            <th width="120">Status Author</th>
-                            <th width="100">Status Akun</th>
-                            <th width="100">Bergabung</th>
-                            <th width="180">Aksi</th>
+                            <th>Total Baca</th>
+                            <th>Status Author</th>
+                            <th>Status Akun</th>
+                            <th>Bergabung</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

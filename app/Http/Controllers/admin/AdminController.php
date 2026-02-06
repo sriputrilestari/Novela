@@ -18,7 +18,7 @@ class AdminController extends Controller
         $totalAuthor = User::where('role', 'author')->count();
         
         // Total Reader (tidak termasuk yang sudah jadi author)
-        $totalReader = User::where('role', 'reader')->count();
+        $totalReader = User::where('role', 'user')->count();
         
         // Novel Pending Approval
         $novelPending = Novel::where('status', 'pending')->count();

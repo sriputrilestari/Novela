@@ -15,25 +15,46 @@ class ReaderController extends Controller
     /**
      * Display a listing of readers
      */
-    public function index(Request $request)
-    {
-        $query = User::whereIn('role', ['user', 'reader'])
-            ->withCount('readingHistories');
+   public function index(Request $request)
+{
+    $query = User::where('role', 'user')
+        ->withCount('readingHistories');
 
-        // filter dari dropdown
-        if ($request->filter === 'pending') {
-            $query->where('author_request', 'pending');
-        } elseif ($request->filter === 'active') {
-            $query->where('is_active', true);
-        } elseif ($request->filter === 'blocked') {
-            $query->where('is_active', false);
-        }
-
-        $readers = $query->paginate(10);
-
-        return view('admin.reader.index', compact('readers'));
+    // filter dropdown
+    if ($request->filter === 'pending') {
+        $query->where('author_request', 'pending');
+    } elseif ($request->filter === 'active') {
+        $query->where('is_active', true);
+    } elseif ($request->filter === 'blocked') {
+        $query->where('is_active', false);
     }
 
+    // INI YANG KURANG
+    $readers = $query->paginate(10);
+
+    // statistik
+    $totalReader = User::where('role', 'user')->count();
+
+    $pendingRequest = User::where('role', 'user')
+        ->where('author_request', 'pending')
+        ->count();
+
+    $activeReader = User::where('role', 'user')
+        ->where('is_active', true)
+        ->count();
+
+    $blockedReader = User::where('role', 'user')
+        ->where('is_active', false)
+        ->count();
+
+    return view('admin.reader.index', compact(
+        'readers',
+        'totalReader',
+        'pendingRequest',
+        'activeReader',
+        'blockedReader'
+    ));
+}
 
     /**
      * Display the specified reader
@@ -70,8 +91,7 @@ class ReaderController extends Controller
      */
     public function edit($id)
     {
-        $reader = User::where('role', 'reader')->findOrFail($id);
-        
+        $reader = User::where('role', 'user')->findOrFail($id);
         return view('admin.reader.edit', compact('reader'));
     }
 
@@ -80,7 +100,7 @@ class ReaderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $reader = User::where('role', 'reader')->findOrFail($id);
+        $reader = User::where('role', 'user')->findOrFail($id);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -126,7 +146,7 @@ class ReaderController extends Controller
             $reader = User::findOrFail($id);
 
             // Validasi bahwa user adalah reader dan ada request author
-            if ($reader->role !== 'reader') {
+            if ($reader->role !== 'user') {
                 return redirect()->back()->with('error', 'User bukan reader');
             }
 
@@ -162,7 +182,7 @@ class ReaderController extends Controller
             $reader = User::findOrFail($id);
 
             // Validasi
-            if ($reader->role !== 'reader') {
+            if ($reader->role !== 'user') {
                 return redirect()->back()->with('error', 'User bukan reader');
             }
 
@@ -218,7 +238,7 @@ class ReaderController extends Controller
         try {
             $reader = User::findOrFail($id);
 
-            if ($reader->role !== 'reader') {
+            if ($reader->role !== 'user') {
                 return redirect()->back()->with('error', 'Tidak dapat menghapus user yang bukan reader');
             }
 

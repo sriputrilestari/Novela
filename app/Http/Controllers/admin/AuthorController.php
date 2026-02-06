@@ -10,13 +10,29 @@ class AuthorController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth','role:admin']);
+        $this->middleware(['auth','role:admin']);   
     }
 
     // 1. Index
     public function index()
     {
-        $authors = User::where('role', 'author')->withCount('novels')->get();
+        $authors = User::where('role', 'author')
+                    ->withCount('novels')
+                    ->paginate(10); // 10 data per halaman
+
+                    // Statistik untuk dashboard / cards di atas tabel
+    $totalAuthor   = User::where('role', 'author')->count();
+    $activeAuthor  = User::where('role', 'author')->where('is_active', true)->count();
+    $blockedAuthor = User::where('role', 'author')->where('is_blocked', true)->count();
+
+    // Kirim ke view
+    return view('admin.author.index', compact(
+        'authors',
+        'totalAuthor',
+        'activeAuthor',
+        'blockedAuthor'
+    ));
+                    
         return view('admin.author.index', compact('authors'));
     }
 
@@ -53,4 +69,15 @@ class AuthorController extends Controller
         $author->delete();
         return redirect()->back()->with('success', 'Author berhasil dihapus.');
     }
+
+    //show
+        public function show($id)
+    {
+        $author = User::where('role', 'author')
+            ->with('novels')
+            ->findOrFail($id);
+
+        return view('admin.author.show', compact('author'));
+    }
+
 }

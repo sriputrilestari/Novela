@@ -7,16 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class Novel extends Model
 {
     protected $fillable = [
+        'user_id',
         'genre_id',
         'judul',
         'sinopsis',
         'penulis',
+        'status',
+        'cover',
         'approval_status'
     ];
 
     public function genre()
     {
-        return $this->belongsTo(Genre::class, 'genre_id');
+        return $this->belongsTo(Genre::class);
     }
 
     public function chapters()
@@ -31,13 +34,11 @@ class Novel extends Model
 
     public function author()
     {
-        return $this->belongsTo(User::class, 'author_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function reports()
     {
         return $this->hasMany(Report::class);
     }
-
 }
-
