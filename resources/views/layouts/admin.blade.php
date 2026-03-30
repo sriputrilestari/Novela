@@ -24,6 +24,8 @@
 
 <body id="page-top">
 
+    <div id="ns"></div>
+
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -104,6 +106,111 @@
     <!-- Page level custom scripts -->
     <script src="{{ asset ('backend/js/demo/chart-area-demo.js')}}"></script>
     <script src="{{ asset ('backend/js/demo/chart-pie-demo.js')}}"></script>
+
+
+    <script>
+function confirmAction(message, callback) {
+    const modal = document.createElement('div');
+    modal.innerHTML = `
+        <div style="
+            position:fixed;
+            top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.4);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:99999;
+        ">
+            <div style="
+                background:white;
+                padding:20px;
+                border-radius:12px;
+                width:300px;
+                text-align:center;
+                box-shadow:0 10px 30px rgba(0,0,0,0.2);
+            ">
+                <h4 style="margin-bottom:10px;">Konfirmasi</h4>
+                <p style="font-size:14px;color:#555;">${message}</p>
+
+                <div style="margin-top:15px;display:flex;gap:10px;justify-content:center;">
+                    <button id="cancelBtn" style="
+                        padding:8px 16px;
+                        border:none;
+                        background:#eee;
+                        border-radius:8px;
+                        cursor:pointer;
+                    ">Batal</button>
+
+                    <button id="okBtn" style="
+                        padding:8px 16px;
+                        border:none;
+                        background:#3d5af1;
+                        color:white;
+                        border-radius:8px;
+                        cursor:pointer;
+                    ">Ya</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector('#cancelBtn').onclick = () => {
+        modal.remove();
+    };
+
+    modal.querySelector('#okBtn').onclick = () => {
+        callback();
+        modal.remove();
+    };
+}
+</script>
+
+    <script>
+const NC = {
+    success: {bg:'#e6fff7', br:'#00c9a7', tx:'#007f6b', ic:'🎉'},
+    error:   {bg:'#ffeaea', br:'#f1523d', tx:'#a12b1b', ic:'❌'},
+    info:    {bg:'#eef0fe', br:'#3d5af1', tx:'#2d48e0', ic:'💡'},
+    warn:    {bg:'#fff6e6', br:'#f1a83d', tx:'#b07010', ic:'⚠️'}
+};
+
+function showN(type, title, msg){
+    const c = NC[type] || NC.info;
+
+    const el = document.createElement('div');
+    el.className = 'nt2';
+
+    el.innerHTML = `
+        <div class="nt2-left" style="background:${c.bg}; color:${c.tx}">
+            ${c.ic}
+        </div>
+        <div>
+            <div class="nt2-title">${title}</div>
+            <div class="nt2-msg">${msg}</div>
+        </div>
+        <div class="nt2-close" onclick="closeN(this.parentElement)">✕</div>
+        <div class="nt2-progress" style="background:${c.br}"></div>
+    `;
+
+    document.getElementById('ns').appendChild(el);
+
+    setTimeout(() => closeN(el), 4000);
+}
+
+function closeN(el){
+    if(!el) return;
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 300);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    @if(session('success')) showN('success','Berhasil',@json(session('success'))); @endif
+    @if(session('error'))   showN('error','Gagal',@json(session('error'))); @endif
+    @if(session('warning')) showN('warn','Perhatian',@json(session('warning'))); @endif
+    @if(session('info'))    showN('info','Info',@json(session('info'))); @endif
+});
+</script>
 
 </body>
 

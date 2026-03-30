@@ -1,31 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\NovelController;
-use App\Http\Controllers\ChapterController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\BookmarkController;
-use App\Http\Controllers\ReadingHistoryController;
-
-// Admin
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthorController as AdminAuthorController;
-use App\Http\Controllers\Admin\NovelController as AdminNovelController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
+use App\Http\Controllers\Admin\NovelController as AdminNovelController;
 use App\Http\Controllers\Admin\ReaderController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\AuthController;
 
-// Author
-use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
-use App\Http\Controllers\Author\NovelController as AuthorNovelController;
+// Admin
 use App\Http\Controllers\Author\ChapterController as AuthorChapterController;
 use App\Http\Controllers\Author\CommentController as AuthorCommentController;
+use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
+use App\Http\Controllers\Author\NovelController as AuthorNovelController;
 use App\Http\Controllers\Author\ProfileController as AuthorProfileController;
+use App\Http\Controllers\BookmarkController;
+
+// Author
+use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\NovelController;
+use App\Http\Controllers\Reader\AuthorRequestController;
+use App\Http\Controllers\ReadingHistoryController;
 
 // Reader
-use App\Http\Controllers\Reader\AuthorRequestController;
+use Illuminate\Support\Facades\Route;
 
 // ------------------------
 // AUTH ROUTES
@@ -56,7 +55,7 @@ Route::middleware('auth')->group(function () {
 // ------------------------
 // ADMIN ROUTES
 // ------------------------
-Route::middleware(['auth','role:admin'])
+Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -103,7 +102,7 @@ Route::middleware(['auth','role:admin'])
 // ------------------------
 // AUTHOR ROUTES
 // ------------------------
-Route::middleware(['auth','role:author'])
+Route::middleware(['auth', 'role:author'])
     ->prefix('author')
     ->name('author.')
     ->group(function () {
@@ -136,7 +135,7 @@ Route::middleware(['auth','role:author'])
         Route::post('/comments/{comment}/reply', [AuthorCommentController::class, 'reply'])->name('comment.reply');
 
         // Profile
-        Route::get('/profile',[AuthorProfileController::class, 'index'])->name('profile.index');
+        Route::get('/profile', [AuthorProfileController::class, 'index'])->name('profile.index');
         Route::get('/profile/edit', [AuthorProfileController::class, 'edit'])->name('profile.edit');
         Route::post('/profile', [AuthorProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/password', [AuthorProfileController::class, 'updatePassword'])->name('profile.password');
@@ -145,7 +144,7 @@ Route::middleware(['auth','role:author'])
 // ------------------------
 // READER ROUTES (Author Request)
 // ------------------------
-Route::middleware(['auth','role:reader'])
+Route::middleware(['auth', 'role:reader'])
     ->prefix('reader')
     ->name('reader.')
     ->group(function () {
