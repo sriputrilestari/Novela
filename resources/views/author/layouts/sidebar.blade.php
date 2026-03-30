@@ -37,7 +37,7 @@
     <li class="nav-item {{ request()->routeIs('author.comment.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('author.comment.index') }}">
             <i class="fas fa-fw fa-comments"></i>
-            <span>Komentar</span>
+            <span>Komentar & feedback</span>
         </a>
     </li>
 

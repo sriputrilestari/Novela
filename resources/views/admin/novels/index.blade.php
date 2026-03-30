@@ -64,14 +64,17 @@
                                     -
                                 @endif
                             </td>
-                            <td>
-                                <span class="badge 
-                                    {{ $novel->approval_status == 'pending' ? 'badge-warning' : ($novel->approval_status == 'published' ? 'badge-success' : 'badge-danger') }}">
-                                    {{ ucfirst($novel->approval_status) }}
-                                </span>
+                           <td>
+                                @if($novel->approval_status == 'pending')
+                                    <span class="badge badge-warning">Pending</span>
+                                @elseif($novel->approval_status == 'published')
+                                    <span class="badge badge-success">Published</span>
+                                @else
+                                    <span class="badge badge-danger">Rejected</span>
+                                @endif
                             </td>
                             <td>
-                                <a href="{{ route('admin.novels.edit',$novel->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                               <a href="{{ route('admin.novels.show',$novel->id) }}" class="btn btn-sm btn-info">View</a>
 
                                 <form action="{{ route('admin.novels.destroy',$novel->id) }}" method="POST" style="display:inline">
                                     @csrf 

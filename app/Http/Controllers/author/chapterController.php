@@ -3,91 +3,141 @@
 namespace App\Http\Controllers\Author;
 
 use App\Http\Controllers\Controller;
-use App\Models\Novel;
 use App\Models\Chapter;
+use App\Models\Novel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ChapterController extends Controller
 {
-    public function index($novel_id)
-    {
-        $novel = Novel::where('author_id', auth()->id())
-            ->findOrFail($novel_id);
+    // LIST CHAPTER PER NOVEL
+   public function index($novel_id)
+{
+    $novel = Novel::where('id', $novel_id)
+        ->where('author_id', Auth::id())
+        ->firstOrFail();
 
-        $chapters = Chapter::where('novel_id', $novel_id)->get();
+    $chapters = $novel->chapters()->orderBy('urutan')->get();
 
-        return view('author.chapter.index', compact('novel','chapters'));
-    }
+    $total = $chapters->count();
+    $published = $chapters->where('status','published')->count();
+    $draft = $chapters->where('status','draft')->count();
 
+    return view('author.chapter.index', compact(
+        'novel','chapters','total','published','draft'
+    ));
+}
+
+    // FORM CREATE
     public function create($novel_id)
     {
-        $novel = Novel::where('author_id', auth()->id())
-            ->findOrFail($novel_id);
+        $novel = Novel::where('id', $novel_id)
+            ->where('author_id', Auth::id())
+            ->firstOrFail();
 
         return view('author.chapter.create', compact('novel'));
     }
 
-    public function store(Request $request)
+    // STORE
+    public function store(Request $request, $novel_id)
     {
-        $request->validate([
-            'novel_id' => 'required',
-            'title'    => 'required',
-            'content'  => 'required',
-            'status'   => 'required'
-        ]);
-
-        Chapter::create([
-            'novel_id' => $request->novel_id,
-            'title'    => $request->title,
-            'content'  => $request->content,
-            'status'   => $request->status
-        ]);
-
-        return redirect()->route('author.chapter.index', $request->novel_id)
-            ->with('success', 'Chapter berhasil ditambahkan');
-    }
-
-    public function edit($id)
-    {
-        $chapter = Chapter::findOrFail($id);
-
-        // pastikan chapter milik author
-        if ($chapter->novel->author_id !== auth()->id()) {
-            abort(403);
-        }
-
-        return view('author.chapter.edit', compact('chapter'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $chapter = Chapter::findOrFail($id);
-
-        if ($chapter->novel->author_id !== auth()->id()) {
-            abort(403);
-        }
+        $novel = Novel::where('id', $novel_id)
+            ->where('author_id', Auth::id())
+            ->firstOrFail();
 
         $request->validate([
-            'title'   => 'required',
+            'urutan'  => 'required|integer|min:1',
+            'title'   => 'required|string|max:255',
             'content' => 'required',
-            'status'  => 'required'
         ]);
 
-        $chapter->update($request->only('title','content','status'));
+        $novel->chapters()->create([
+            'urutan'        => $request->urutan,
+            'judul_chapter' => $request->title,
+            'isi'           => $request->content,
+            'status'        => 'draft',
+        ]);
 
-        return back()->with('success', 'Chapter diperbarui');
+        return redirect()->route('author.chapter.index', $novel->id)
+            ->with('success', 'Chapter berhasil ditambahkan.');
     }
 
-    public function destroy($id)
+    // FORM EDIT
+    public function edit(Novel $novel, Chapter $chapter)
     {
-        $chapter = Chapter::findOrFail($id);
+        if ($novel->author_id !== Auth::id()) abort(403);
 
-        if ($chapter->novel->author_id !== auth()->id()) {
-            abort(403);
-        }
+        return view('author.chapter.edit', compact('novel','chapter'));
+    }
+
+    // UPDATE
+    public function update(Request $request, $novel_id, $id)
+    {
+        $novel = Novel::where('id', $novel_id)
+            ->where('author_id', Auth::id())
+            ->firstOrFail();
+
+        $chapter = Chapter::where('id', $id)
+            ->where('novel_id', $novel->id)
+            ->firstOrFail();
+
+        $request->validate([
+            'urutan'  => 'required|integer|min:1',
+            'title'   => 'required|string|max:255',
+            'content' => 'required',
+        ]);
+
+        $chapter->update([
+            'urutan'        => $request->urutan,
+            'judul_chapter' => $request->title,
+            'isi'           => $request->content,
+            'status'        => $chapter->status ?? 'draft',
+        ]);
+
+        return redirect()->route('author.chapter.index', $novel->id)
+            ->with('success', 'Chapter berhasil diupdate.');
+    }
+
+    // SHOW
+    public function show($novel_id, $id)
+    {
+        $novel = Novel::where('id', $novel_id)
+            ->where('author_id', Auth::id())
+            ->firstOrFail();
+
+        $chapter = Chapter::where('id', $id)
+            ->where('novel_id', $novel->id)
+            ->firstOrFail();
+
+        return view('author.chapter.show', compact('novel', 'chapter'));
+    }
+
+    // DELETE
+    public function destroy($novel_id, $id)
+    {
+        $chapter = Chapter::whereHas('novel', function ($q) {
+            $q->where('author_id', Auth::id());
+        })->findOrFail($id);
 
         $chapter->delete();
 
-        return back()->with('success', 'Chapter dihapus');
+        return back()->with('success', 'Chapter berhasil dihapus');
+    }
+
+    // TOGGLE STATUS
+    public function toggle($novel_id, $id)
+    {
+        $novel = Novel::where('id', $novel_id)
+            ->where('author_id', Auth::id())
+            ->firstOrFail();
+
+        $chapter = Chapter::where('id', $id)
+            ->where('novel_id', $novel->id)
+            ->firstOrFail();
+
+        $chapter->status = $chapter->status === 'draft' ? 'published' : 'draft';
+        $chapter->save();
+
+        return back()->with('success', 'Status berhasil diperbarui.');
     }
 }

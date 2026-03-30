@@ -1,6 +1,17 @@
 @extends('layouts.admin')
 
 @section('content')
+
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <form action="{{ route('admin.novels.update', $novel->id) }}" method="POST">
     @csrf
     @method('PUT')
@@ -12,7 +23,7 @@
     <select name="genre_id" class="form-control">
         @foreach($genres as $genre)
             <option value="{{ $genre->id }}" {{ $novel->genre_id == $genre->id ? 'selected' : '' }}>
-                {{ $genre->name }}
+                {{ $genre->nama_genre }}
             </option>
         @endforeach
     </select>
@@ -24,7 +35,7 @@
     <select name="approval_status" class="form-control">
         <option value="pending" {{ $novel->approval_status == 'pending' ? 'selected' : '' }}>Pending</option>
         <option value="published" {{ $novel->approval_status == 'published' ? 'selected' : '' }}>Published</option>
-        <option value="rejected" {{ $novel->approval_status == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+        <option value="rejected" {{ $novel->approval_status == 'rejected' ? 'selected' : '' }}>Rejected</option>
     </select>
 
     <button type="submit" class="btn btn-primary mt-2">Simpan</button>

@@ -339,27 +339,26 @@
                         <i class="fas fa-book-open"></i>
                     </div>
                     <h2>Novela</h2>
-                    <p>Your gateway to endless stories and adventures</p>
+                    <p>Buat akun terlebih dahulu agar anda bisa memulai membaca</p>
                     <div class="feature-list">
                         <div class="feature-item">
                             <i class="fas fa-check"></i>
-                            <span>Thousands of novels to explore</span>
+                            <span>Cari Genre yang anda sukai</span>
                         </div>
                         <div class="feature-item">
                             <i class="fas fa-check"></i>
-                            <span>Track your reading progress</span>
+                            <span>anda bisa jadi author terbaik</span>
                         </div>
                         <div class="feature-item">
                             <i class="fas fa-check"></i>
-                            <span>Join the community</span>
+                            <span>Cari Novel favorit anda di sini</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="login-right">
                 <div class="login-header">
-                    <h1>Welcome Back</h1>
-                    <p>Sign in to continue your reading journey</p>
+                    <h1>Selamat Datang</h1>
                 </div>
                 @if($errors->any())
                 <div class="alert alert-danger">
@@ -370,14 +369,14 @@
                 <form method="POST" action="{{ route('login') }}" id="loginForm">
                     @csrf
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label for="email">Email</label>
                         <div class="input-group">
                             <input type="email" 
                                    class="form-control" 
                                    id="email" 
                                    name="email" 
                                    value="{{ old('email') }}"
-                                   placeholder="you@example.com"
+                                   placeholder="email@gmail.com"
                                    required 
                                    autofocus>
                             <i class="fas fa-envelope input-icon"></i>
@@ -390,7 +389,7 @@
                                    class="form-control" 
                                    id="password" 
                                    name="password" 
-                                   placeholder="Enter your password"
+                                   placeholder="masukan password email"
                                    required>
                             <i class="fas fa-eye-slash input-icon" id="togglePassword"></i>
                         </div>
@@ -398,14 +397,14 @@
                     <div class="remember-forgot">
                         <div class="custom-checkbox">
                             <input type="checkbox" id="remember" name="remember">
-                            <label for="remember">Remember me</label>
+                            <label for="remember">Ingatkan saya</label>
                         </div>
-                        <a href="#" class="forgot-link">Forgot Password?</a>
+                        <a href="#" class="forgot-link">Lupa Password?</a>
                     </div>
-                    <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
+                    <button type="submit" class="btn-login" id="loginBtn">Masuk</button>
                 </form>
                 <div class="register-link">
-                    Don't have an account? <a href="{{ route('register') }}">Create Account</a>
+                    Belum Punya Akun? <a href="{{ route('register') }}">Buat Akun</a>
                 </div>
             </div>
         </div>

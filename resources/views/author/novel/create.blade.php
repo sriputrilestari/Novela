@@ -47,7 +47,8 @@
             </div>
 
             <button class="btn btn-primary">Simpan</button>
-
+            <a href="{{ route('author.novel.index') }}"
+                class="btn btn-secondary">Kembali</a>
         </form>
 
     </div>

@@ -327,13 +327,13 @@
                         <i class="fas fa-book-open"></i>
                     </div>
                     <h2>Join Novela</h2>
-                    <p>Start your reading adventure today and discover thousands of amazing stories</p>
+                    <p>Mulailah petualangan membaca Anda hari ini dan temukan ribuan cerita menakjubkan.</p>
                 </div>
             </div>
             <div class="register-right">
                 <div class="register-header">
-                    <h1>Create Account</h1>
-                    <p>Fill in the details below to get started</p>
+                    <h1>Buat Akun</h1>
+                    <p>Isi detail di bawah ini untuk memulai.</p>
                 </div>
                 @if($errors->any())
                 <div class="alert alert-danger">
@@ -344,60 +344,60 @@
                 <form method="POST" action="{{ route('register') }}" id="registerForm">
                     @csrf
                     <div class="form-group">
-                        <label for="name">Full Name</label>
+                        <label for="name">Nama Panjang</label>
                         <div class="input-group">
                             <input type="text" 
                                    class="form-control" 
                                    id="name" 
                                    name="name" 
                                    value="{{ old('name') }}"
-                                   placeholder="John Doe"
+                                   placeholder="Nama Anda"
                                    required 
                                    autofocus>
                             <i class="fas fa-user input-icon"></i>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label for="email">Email</label>
                         <div class="input-group">
                             <input type="email" 
                                    class="form-control" 
                                    id="email" 
                                    name="email" 
                                    value="{{ old('email') }}"
-                                   placeholder="you@example.com"
+                                   placeholder="email@gmail.com"
                                    required>
                             <i class="fas fa-envelope input-icon"></i>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password">Kata Sandi</label>
                         <div class="input-group">
                             <input type="password" 
                                    class="form-control" 
                                    id="password" 
                                    name="password" 
-                                   placeholder="Create a strong password"
+                                   placeholder="Buat kata sandi yang kuat"
                                    required>
                             <i class="fas fa-eye-slash input-icon" id="togglePassword"></i>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="password_confirmation">Confirm Password</label>
+                        <label for="password_confirmation">Konfirmasi Kata Sandi</label>
                         <div class="input-group">
                             <input type="password" 
                                    class="form-control" 
                                    id="password_confirmation" 
                                    name="password_confirmation" 
-                                   placeholder="Re-enter your password"
+                                   placeholder="Masukkan kembali kata sandi Anda"
                                    required>
                             <i class="fas fa-eye-slash input-icon" id="togglePasswordConfirm"></i>
                         </div>
                     </div>
-                    <button type="submit" class="btn-register" id="registerBtn">Create Account</button>
+                    <button type="submit" class="btn-register" id="registerBtn">Buat Akun</button>
                 </form>
                 <div class="login-link">
-                    Already have an account? <a href="{{ route('login') }}">Sign In</a>
+                    Sudah punya akun? <a href="{{ route('login') }}">Masuk</a>
                 </div>
             </div>
         </div>

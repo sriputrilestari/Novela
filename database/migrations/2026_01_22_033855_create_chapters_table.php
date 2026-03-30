@@ -17,6 +17,7 @@ return new class extends Migration
         $table->string('judul_chapter');
         $table->longText('isi');
         $table->integer('urutan');
+        $table->enum('status', ['draft','published'])->default('draft');
         $table->timestamps();
        });
 

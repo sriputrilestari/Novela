@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Novel extends Model
 {
     protected $fillable = [
-        'user_id',
+        'author_id',       // wajib, bukan user_id lagi
         'genre_id',
         'judul',
         'sinopsis',
-        'penulis',
         'status',
         'cover',
-        'approval_status'
+        'approval_status',
+        'views',
     ];
 
+    // RELASI
     public function genre()
     {
         return $this->belongsTo(Genre::class);
@@ -34,7 +35,7 @@ class Novel extends Model
 
     public function author()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     public function reports()

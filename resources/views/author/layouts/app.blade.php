@@ -16,6 +16,32 @@
     <!-- Custom styles -->
     <link href="{{ asset('backend/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
+  <style>
+    .btn-primary {
+        background-color: #5B8DEF !important;
+        border-color: #5B8DEF !important;
+    }
+
+    .btn-primary:hover {
+        background-color: #4A7BE0 !important;
+        border-color: #4A7BE0 !important;
+    }
+
+    .btn-outline-primary {
+        color: #5B8DEF !important;
+        border-color: #5B8DEF !important;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #5B8DEF !important;
+        color: white !important;
+    }
+
+    .badge.bg-primary {
+        background-color: #5B8DEF !important;
+    }
+</style>
+
 </head>
 
 <body id="page-top">

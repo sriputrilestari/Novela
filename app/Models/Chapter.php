@@ -10,25 +10,23 @@ class Chapter extends Model
         'novel_id',
         'judul_chapter',
         'isi',
-        'urutan'
+        'urutan',
+        'status'
     ];
 
-    
+    // RELASI
     public function novel()
     {
         return $this->belongsTo(Novel::class);
     }
 
-    
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
-
 
     public function readingHistories()
     {
         return $this->hasMany(ReadingHistory::class);
     }
 }
-

@@ -19,27 +19,36 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         $request->validate([
-            'bio'    => 'nullable',
-            'social' => 'nullable',
-            'photo'  => 'nullable|image',
-            'password' => 'nullable|min:6'
+            'bio' => 'nullable|string',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('photo')) {
-            if ($user->photo) {
-                Storage::disk('public')->delete($user->photo);
-            }
-            $user->photo = $request->file('photo')->store('profiles', 'public');
+            $path = $request->file('photo')->store('profiles', 'public');
+            $user->photo = $path;
         }
 
-        if ($request->password) {
-            $user->password = Hash::make($request->password);
-        }
-
-        $user->bio    = $request->bio;
-        $user->social = $request->social;
+        $user->bio = $request->bio;
         $user->save();
 
-        return back()->with('success', 'Profile berhasil diperbarui');
+        return back()->with('success', 'Profile berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, auth()->user()->password)) {
+            return back()->withErrors(['current_password' => 'Password lama salah']);
+        }
+
+        auth()->user()->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return back()->with('success', 'Password berhasil diganti.');
     }
 }

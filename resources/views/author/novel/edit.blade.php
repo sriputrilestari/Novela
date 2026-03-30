@@ -1,80 +1,101 @@
 @extends('author.layouts.app')
 
 @section('content')
-    <div class="container-fluid">
+<div class="container-fluid">
 
-        <h1 class="h3 mb-4 text-gray-800">Edit Novel</h1>
+    <h1 class="h3 mb-4 text-gray-800">Edit Novel</h1>
 
-        <div class="card shadow">
-            <div class="card-body">
+    <div class="card shadow">
+        <div class="card-body">
 
-                <form action="{{ route('author.novels.update', $novel->id) }}"
-                      method="POST">
-                    @csrf
-                    @method('PUT')
+            <form action="{{ route('author.novel.update', $novel->id) }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
 
-                    <div class="form-group">
-                        <label>Judul Novel</label>
-                        <input type="text"
-                               name="title"
-                               class="form-control"
-                               value="{{ $novel->title }}"
-                               required>
-                    </div>
+                {{-- JUDUL --}}
+                <div class="form-group">
+                    <label>Judul Novel</label>
+                    <input type="text"
+                           name="judul"
+                           class="form-control"
+                           value="{{ $novel->judul }}"
+                           required>
+                </div>
 
-                    <div class="form-group">
-                        <label>Genre</label>
-                        <select name="genre_id" class="form-control">
-                            @foreach ($genres as $genre)
-                                <option value="{{ $genre->id }}"
-                                    {{ $novel->genre_id == $genre->id ? 'selected' : '' }}>
-                                    {{ $genre->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Deskripsi</label>
-                        <textarea name="description"
-                                  rows="4"
-                                  class="form-control">{{ $novel->description }}</textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="status" class="form-control">
-                            <option value="draft"
-                                {{ $novel->status == 'draft' ? 'selected' : '' }}>
-                                Draft
+                {{-- GENRE --}}
+                <div class="form-group">
+                    <label>Genre</label>
+                    <select name="genre_id" class="form-control" required>
+                        @foreach ($genres as $genre)
+                            <option value="{{ $genre->id }}"
+                                {{ $novel->genre_id == $genre->id ? 'selected' : '' }}>
+                                {{ $genre->nama_genre }}
                             </option>
-                            <option value="pending"
-                                {{ $novel->status == 'pending' ? 'selected' : '' }}>
-                                Pending
-                            </option>
-                            <option value="publish"
-                                {{ $novel->status == 'publish' ? 'selected' : '' }}>
-                                Publish
-                            </option>
-                        </select>
-                    </div>
+                        @endforeach
+                    </select>
+                </div>
 
-                    <div class="text-right">
-                        <a href="{{ route('author.novels.index') }}"
-                           class="btn btn-secondary">
-                            Kembali
-                        </a>
+                {{-- SINOPSIS --}}
+                <div class="form-group">
+                    <label>Sinopsis</label>
+                    <textarea name="sinopsis"
+                              rows="4"
+                              class="form-control"
+                              required>{{ $novel->sinopsis }}</textarea>
+                </div>
 
-                        <button type="submit"
-                                class="btn btn-warning">
-                            Update
-                        </button>
-                    </div>
+                {{-- COVER --}}
+                <div class="form-group">
+                    <label>Cover Novel</label><br>
 
-                </form>
+                    @if ($novel->cover)
+                        <img src="{{ asset('storage/' . $novel->cover) }}"
+                             width="120"
+                             class="mb-2 d-block rounded shadow">
+                    @endif
 
-            </div>
+                    <input type="file"
+                           name="cover"
+                           class="form-control-file">
+
+                    <small class="text-muted">
+                        Kosongkan jika tidak ingin mengganti cover
+                    </small>
+                </div>
+
+                {{-- STATUS --}}
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status" class="form-control" required>
+                        <option value="ongoing"
+                            {{ $novel->status == 'ongoing' ? 'selected' : '' }}>
+                            Ongoing
+                        </option>
+                        <option value="completed"
+                            {{ $novel->status == 'completed' ? 'selected' : '' }}>
+                            Completed
+                        </option>
+                    </select>
+                </div>
+
+                <div class="text-right">
+                    <a href="{{ route('author.novel.index') }}"
+                       class="btn btn-secondary">
+                        Kembali
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-warning">
+                         <i class="fas fa-save me-1"></i> Simpan Perubahan
+                    </button>
+                </div>
+
+            </form>
+
         </div>
-
     </div>
+
+</div>
 @endsection
