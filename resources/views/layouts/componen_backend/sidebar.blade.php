@@ -1,8 +1,7 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-    <!-- BRAND -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center"
-       href="{{ route('admin.dashboard') }}">
+    {{-- Brand --}}
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('admin.dashboard') }}">
         <div class="sidebar-brand-icon">
             <i class="fas fa-book-reader"></i>
         </div>
@@ -11,7 +10,7 @@
 
     <hr class="sidebar-divider my-0">
 
-    <!-- DASHBOARD -->
+    {{-- Dashboard --}}
     <li class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('admin.dashboard') }}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -20,72 +19,48 @@
     </li>
 
     <hr class="sidebar-divider">
-
-    <!-- USERS -->
     <div class="sidebar-heading">Kelola User</div>
 
-    <li class="nav-item {{ request()->is('admin/authors*') || request()->is('admin/readers*') ? 'active' : '' }}">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse"
-           data-target="#collapseUsers" aria-expanded="true">
-            <i class="fas fa-fw fa-user-friends"></i>
-            <span>Users</span>
+    {{-- Reader --}}
+    <li class="nav-item {{ request()->routeIs('admin.reader.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.reader.index') }}">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Reader</span>
         </a>
-        <div id="collapseUsers"
-             class="collapse {{ request()->is('admin/authors*') || request()->is('admin/readers*') ? 'show' : '' }}">
-            <div class="bg-white py-2 collapse-inner rounded">
-                 <a class="collapse-item {{ request()->routeIs('admin.reader.index') ? 'active' : '' }}"
-                   href="{{ route('admin.reader.index') }}">
-                    Reader
-                </a>
-                <a class="collapse-item {{ request()->routeIs('admin.author.index') ? 'active' : '' }}"
-                   href="{{ route('admin.author.index') }}">
-                    Author
-                </a>
-            </div>
-        </div>
+    </li>
+
+    {{-- Author --}}
+    <li class="nav-item {{ request()->routeIs('admin.authors.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.author.index') }}">
+            <i class="fas fa-fw fa-user-tie"></i>
+            <span>Author</span>
+        </a>
     </li>
 
     <hr class="sidebar-divider">
     <div class="sidebar-heading">Kelola Novel</div>
-    <!-- GENRE -->
-    <li class="nav-item {{ request()->is('admin/genres*') ? 'active' : '' }}">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse"
-           data-target="#genreMenu" aria-expanded="true">
-            <i class="fas fa-tags"></i>
+
+    {{-- Genre --}}
+    <li class="nav-item {{ request()->routeIs('admin.genre.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.genre.index') }}">
+            <i class="fas fa-fw fa-tags"></i>
             <span>Genre</span>
         </a>
-        <div id="genreMenu"
-             class="collapse {{ request()->is('admin/genres*') ? 'show' : '' }}">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ request()->routeIs('admin.genre.index') ? 'active' : '' }}"
-                   href="{{ route('admin.genre.index') }}">
-                    Semua Genre
-                </a>
-            </div>
-        </div>
     </li>
 
-    <!-- NOVEL -->
-    <li class="nav-item {{ request()->is('admin/novels*') ? 'active' : '' }}">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse"
-           data-target="#novelMenu" aria-expanded="true">
-            <i class="fas fa-book-open"></i>
+    {{-- Novel --}}
+    <li class="nav-item {{ request()->routeIs('admin.novels.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.novels.index') }}">
+            <i class="fas fa-fw fa-book-open"></i>
             <span>Novel</span>
         </a>
-        <div id="novelMenu"
-             class="collapse {{ request()->is('admin/novels*') ? 'show' : '' }}">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('admin.novels.index') }}">Semua Novel</a>
-            </div>
-        </div>
     </li>
 
     <hr class="sidebar-divider">
-
-    <!-- LAPORAN -->
     <div class="sidebar-heading">Laporan</div>
 
-    <li class="nav-item {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}">
+    {{-- Report --}}
+    <li class="nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('admin.reports.index') }}">
             <i class="fas fa-fw fa-file-alt"></i>
             <span>Report Novel</span>
@@ -93,23 +68,33 @@
     </li>
 
     <hr class="sidebar-divider">
+    <div class="sidebar-heading">Akun</div>
 
-    <!-- SETTINGS -->
-    <div class="sidebar-heading">Settings</div>
-
-    <li class="nav-item">
-        <a class="nav-link" href="#">
+    {{-- Profile --}}
+    <li class="nav-item {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.profile.index')}}">
             <i class="fas fa-fw fa-user-cog"></i>
             <span>Profile</span>
         </a>
     </li>
 
+    {{-- Logout --}}
     <li class="nav-item">
         <a class="nav-link" href="{{ route('logout') }}"
-           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="fas fa-fw fa-sign-out-alt"></i>
-            <span>Logout</span>
+            <span>Keluar</span>
         </a>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
     </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+
+    {{-- Toggle Sidebar --}}
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
 
 </ul>

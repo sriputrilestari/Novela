@@ -1,23 +1,38 @@
 <?php
-
 namespace App\Http\Controllers\Author;
 
 use App\Http\Controllers\Controller;
-use App\Models\Novel;
 use App\Models\Genre;
+use App\Models\Novel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class NovelController extends Controller
 {
-    public function index()
-    {
-        $novels = Novel::where('author_id', Auth::id())
-            ->latest()
-            ->get();
+    public function index(Request $request) {
+        $query = Novel::with('genre')->where('author_id', auth()->id());
 
-        return view('author.novel.index', compact('novels'));
+        // FILTER STATUS CERITA
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // FILTER APPROVAL
+        if ($request->approval) {
+            $query->where('approval_status', $request->approval);
+        }
+
+        // FILTER GENRE
+        if ($request->genre) {
+            $query->where('genre_id', $request->genre);
+        }
+
+        $novels = $query->latest()->get();
+
+        $genres = Genre::all();
+
+        return view('author.novel.index', compact('novels', 'genres'));
     }
 
     public function create()
@@ -72,14 +87,17 @@ class NovelController extends Controller
         ]);
 
         $data = [
-            'judul'           => $request->judul,
-            'genre_id'        => $request->genre_id,
-            'sinopsis'        => $request->sinopsis,
-            'status'          => $request->status,
+            'judul'    => $request->judul,
+            'genre_id' => $request->genre_id,
+            'sinopsis' => $request->sinopsis,
+            'status'   => $request->status,
         ];
 
         if ($request->hasFile('cover')) {
-            if ($novel->cover) Storage::disk('public')->delete($novel->cover);
+            if ($novel->cover) {
+                Storage::disk('public')->delete($novel->cover);
+            }
+
             $data['cover'] = $request->file('cover')->store('covers', 'public');
         }
 
@@ -91,8 +109,14 @@ class NovelController extends Controller
 
     public function destroy(Novel $novel)
     {
-        if ($novel->author_id !== Auth::id()) abort(403);
-        if ($novel->cover) Storage::disk('public')->delete($novel->cover);
+        if ($novel->author_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($novel->cover) {
+            Storage::disk('public')->delete($novel->cover);
+        }
+
         $novel->delete();
 
         return redirect()->route('author.novel.index')

@@ -4,21 +4,21 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthorController as AdminAuthorController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\NovelController as AdminNovelController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ReaderController;
-use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\AuthController;
 
 // Admin
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Author\ChapterController as AuthorChapterController;
 use App\Http\Controllers\Author\CommentController as AuthorCommentController;
 use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
 use App\Http\Controllers\Author\NovelController as AuthorNovelController;
 use App\Http\Controllers\Author\ProfileController as AuthorProfileController;
-use App\Http\Controllers\BookmarkController;
 
 // Author
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
-use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NovelController;
 use App\Http\Controllers\Reader\AuthorRequestController;
 use App\Http\Controllers\ReadingHistoryController;
@@ -95,8 +95,17 @@ Route::middleware(['auth', 'role:admin'])
         Route::delete('/genres/{id}', [AdminGenreController::class, 'destroy'])->name('genre.destroy');
 
         // Reports
-        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::post('/reports/{id}/{status}', [ReportController::class, 'updateStatus'])->name('reports.updateStatus');
+        Route::get('reports', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
+        Route::post('reports/{report}/review', [AdminReportController::class, 'review'])->name('reports.review');
+        Route::post('reports/{report}/warn', [AdminReportController::class, 'warn'])->name('reports.warn');
+        Route::post('reports/{report}/reject', [AdminReportController::class, 'reject'])->name('reports.reject');
+        Route::delete('reports/{report}/delete-novel', [AdminReportController::class, 'deleteNovel'])->name('reports.deleteNovel');
+
+        //Profile
+        Route::get('profile', [AdminProfileController::class, 'index'])->name('profile.index');
+        Route::post('profile/update', [AdminProfileController::class, 'update'])->name('profile.update');
+        Route::post('profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password');
     });
 
 // ------------------------
@@ -129,16 +138,20 @@ Route::middleware(['auth', 'role:author'])
         Route::patch('/novels/{novel}/chapters/{chapter}/toggle', [AuthorChapterController::class, 'toggle'])->name('chapter.toggle');
 
         // Comments
-        Route::get('/comments', [AuthorCommentController::class, 'index'])->name('comment.index');
-        Route::get('/comment/{id}', [AuthorCommentController::class, 'show'])->name('comment.show');
-        Route::delete('/comments/{id}', [AuthorCommentController::class, 'destroy'])->name('comment.destroy');
-        Route::post('/comments/{comment}/reply', [AuthorCommentController::class, 'reply'])->name('comment.reply');
+        Route::prefix('comments')->name('comment.')->group(function () {
+            Route::get('/', [AuthorCommentController::class, 'index'])->name('index');
+            Route::get('/{id}', [AuthorCommentController::class, 'show'])->name('show');
+            Route::post('/{id}/reply', [AuthorCommentController::class, 'reply'])->name('reply');
+            Route::patch('/{id}/toxic', [AuthorCommentController::class, 'markToxic'])->name('toxic');
+            Route::delete('/{id}', [AuthorCommentController::class, 'destroy'])->name('destroy');
+        });
 
         // Profile
         Route::get('/profile', [AuthorProfileController::class, 'index'])->name('profile.index');
         Route::get('/profile/edit', [AuthorProfileController::class, 'edit'])->name('profile.edit');
         Route::post('/profile', [AuthorProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/password', [AuthorProfileController::class, 'updatePassword'])->name('profile.password');
+
     });
 
 // ------------------------
@@ -152,6 +165,12 @@ Route::middleware(['auth', 'role:reader'])
         Route::post('/author-request', [AuthorRequestController::class, 'submit'])->name('author-request.submit');
         Route::post('/author-request/reapply', [AuthorRequestController::class, 'reapply'])->name('author-request.reapply');
         Route::post('/author-request/cancel', [AuthorRequestController::class, 'cancel'])->name('author-request.cancel');
+
+        //Profile
+        Route::get('profile', [ReaderProfileController::class, 'index'])->name('profile.index');
+        Route::post('profile/update', [ReaderProfileController::class, 'update'])->name('profile.update');
+        Route::post('profile/password', [ReaderProfileController::class, 'updatePassword'])->name('profile.password');
+
     });
 
 // Redirect /home → /

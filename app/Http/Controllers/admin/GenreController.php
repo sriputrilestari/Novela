@@ -1,17 +1,23 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Genre;
+use Illuminate\Http\Request;
 
 class GenreController extends Controller
 {
     // LIST ALL GENRES
-    public function index()
+    public function index(Request $request)
     {
-        $genres = Genre::withCount('novels')->get();
+        $sort = in_array($request->get('sort'), ['asc', 'desc'])
+            ? $request->get('sort')
+            : 'desc';
+
+        $genres = Genre::withCount('novels')
+            ->orderBy('novels_count', $sort)
+            ->get();
+
         return view('admin.genre.index', compact('genres'));
     }
 
@@ -25,11 +31,11 @@ class GenreController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_genre' => 'required|unique:genres,nama_genre'
+            'nama_genre' => 'required|unique:genres,nama_genre',
         ]);
 
         Genre::create([
-            'nama_genre' => $request->nama_genre
+            'nama_genre' => $request->nama_genre,
         ]);
 
         return redirect()->route('admin.genre.index')
@@ -37,9 +43,8 @@ class GenreController extends Controller
     }
 
     // SHOW FORM EDIT
-    public function edit($id)
-    {
-        $genre = Genre::findOrFail($id);
+    public function edit($id) {
+        $genre = Genre::withCount('novels')->findOrFail($id);
         return view('admin.genre.edit', compact('genre'));
     }
 
@@ -49,11 +54,11 @@ class GenreController extends Controller
         $genre = Genre::findOrFail($id);
 
         $request->validate([
-            'nama_genre' => 'required|unique:genres,nama_genre,' . $genre->id
+            'nama_genre' => 'required|unique:genres,nama_genre,' . $genre->id,
         ]);
 
         $genre->update([
-            'nama_genre' => $request->nama_genre
+            'nama_genre' => $request->nama_genre,
         ]);
 
         return redirect()->route('admin.genre.index')

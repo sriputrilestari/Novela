@@ -64,17 +64,11 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4 mb-xl-0">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Genre Terpopuler</div>
-                                <div class="h6 mb-0 font-weight-bold text-gray-800">
-                                    {{ $genres->sortByDesc('novels_count')->first()?->nama_genre ?? '-' }}
-                                </div>
-                            </div>
-                            <div class="col-auto"><i class="fas fa-fire fa-2x text-gray-300"></i></div>
-                        </div>
+                <div class="card shadow h-100 py-2" style="border-left: 4px solid #4e73df;">
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <a href="{{ route('admin.genre.create') }}" class="btn btn-primary btn-block">
+                            <i class="fas fa-plus-circle mr-2"></i>Tambah Genre Baru
+                        </a>
                     </div>
                 </div>
             </div>
@@ -106,7 +100,6 @@
                 <h6 class="m-0 font-weight-bold text-primary">
                     <i class="fas fa-list mr-2"></i>Daftar Genre
                 </h6>
-                <span class="badge badge-primary badge-pill px-3">{{ $genres->count() }} genre</span>
             </div>
 
             <div class="card-body p-0">

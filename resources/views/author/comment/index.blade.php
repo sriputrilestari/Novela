@@ -1,230 +1,260 @@
+{{-- resources/views/author/comment/index.blade.php --}}
 @extends('author.layouts.app')
+
+@section('title', 'Komentar & Feedback')
 
 @section('content')
 
-{{-- ═══════════════════════════════════════════
-     NOTIFICATION STACK  (bottom-right)
-═══════════════════════════════════════════ --}}
-<div id="notifStack" style="
-  position:fixed;bottom:28px;right:28px;z-index:9999;
-  display:flex;flex-direction:column-reverse;gap:10px;pointer-events:none;">
-</div>
-
-<style>
-.notif{
-  pointer-events:all;
-  display:flex;align-items:center;gap:12px;
-  background:rgba(255,255,255,.95);
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  border:1px solid rgba(255,255,255,.8);
-  border-radius:14px;padding:14px 16px;
-  min-width:300px;max-width:360px;
-  box-shadow:0 8px 32px rgba(24,25,42,.15),0 2px 8px rgba(24,25,42,.08);
-  animation:notifIn .4s cubic-bezier(.16,1,.3,1) both;
-  position:relative;overflow:hidden;
-  font-family:'Plus Jakarta Sans','Segoe UI',sans-serif;
-}
-.notif.hide{animation:notifOut .3s ease forwards;}
-.notif-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;}
-.notif-body{flex:1;}
-.notif-title{font-size:13px;font-weight:700;color:#18192a;line-height:1.2;}
-.notif-msg{font-size:12px;color:#5a5f7a;margin-top:2px;line-height:1.4;}
-.notif-x{width:26px;height:26px;border-radius:7px;background:#f7f8fc;border:1px solid #e0e4ef;color:#9698ae;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .2s;flex-shrink:0;}
-.notif-x:hover{background:#e0e4ef;color:#18192a;}
-.notif-bar{position:absolute;bottom:0;left:0;height:3px;border-radius:99px;animation:notifBar 4.5s linear forwards;}
-@keyframes notifIn {from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes notifOut{to{opacity:0;transform:translateY(10px) scale(.9);max-height:0;margin:0;padding:0;overflow:hidden;}}
-@keyframes notifBar{from{width:100%}to{width:0%}}
-</style>
-
-<script>
-const _NC={
-  success:{b:'#00c9a7',i:'#e0faf5',t:'#00a88a',ic:'✓'},
-  error:  {b:'#f1523d',i:'#fef0ee',t:'#c43020',ic:'✗'},
-  info:   {b:'#3d5af1',i:'#eef0fe',t:'#2d48e0',ic:'ℹ'},
-  warn:   {b:'#f1a83d',i:'#fef6e6',t:'#c48020',ic:'!'},
-};
-function showNotif(type,title,msg,duration){
-  const c=_NC[type]||_NC.info;
-  const el=document.createElement('div');
-  el.className='notif';
-  el.innerHTML=`
-    <div class="notif-ico" style="background:${c.i};color:${c.t}">${c.ic}</div>
-    <div class="notif-body">
-      <div class="notif-title">${title}</div>
-      <div class="notif-msg">${msg}</div>
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 font-weight-bold">💬 Komentar & Feedback</h1>
+            <small class="text-muted">Kelola komentar reader dari semua novel kamu</small>
+        </div>
     </div>
-    <button class="notif-x" type="button" onclick="closeNotif(this.parentElement)">✕</button>
-  `;
-  const bar=document.createElement('div');
-  bar.className='notif-bar';bar.style.background=c.b;
-  el.appendChild(bar);
-  document.getElementById('notifStack').appendChild(el);
-  setTimeout(()=>closeNotif(el),duration||4500);
-}
-function closeNotif(el){
-  if(!el||el.classList.contains('hide'))return;
-  el.classList.add('hide');
-  setTimeout(()=>el&&el.remove(),350);
-}
 
-// Auto-fire dari session Laravel
-document.addEventListener('DOMContentLoaded',function(){
-  @if(session('success'))
-    showNotif('success','Berhasil ✓',@json(session('success')));
-  @endif
-  @if(session('error'))
-    showNotif('error','Terjadi Kesalahan',@json(session('error')));
-  @endif
-  @if(session('warning'))
-    showNotif('warn','Perhatian',@json(session('warning')));
-  @endif
-  @if(session('info'))
-    showNotif('info','Informasi',@json(session('info')));
-  @endif
-});
-</script>
+    <!-- Alert sukses -->
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert"
+            style="border-left:4px solid #1cc88a;">
+            <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        </div>
+    @endif
 
-{{-- ═══════════════════════════════════════════
-     MODAL KONFIRMASI HAPUS KOMENTAR
-═══════════════════════════════════════════ --}}
-<div id="deleteModal" style="
-  position:fixed;inset:0;background:rgba(24,25,42,.55);z-index:8888;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  opacity:0;pointer-events:none;transition:opacity .2s;">
-  <div id="deleteModalBox" style="
-    background:#fff;border:1px solid #e0e4ef;border-radius:18px;
-    padding:32px;max-width:400px;width:100%;
-    box-shadow:0 20px 60px rgba(24,25,42,.2);
-    transform:scale(.95);transition:all .25s cubic-bezier(.34,1.56,.64,1);
-    font-family:'Plus Jakarta Sans','Segoe UI',sans-serif;">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-      <div style="width:48px;height:48px;border-radius:14px;background:#fef0ee;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🗑️</div>
-      <div style="font-size:18px;font-weight:800;color:#18192a;">Hapus Komentar?</div>
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert"
+            style="border-left:4px solid #e74a3b;">
+            <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        </div>
+    @endif
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <!-- Semua Komentar -->
+        <div class="col-xl-4 col-md-6 mb-3">
+            <div class="card shadow h-100 py-2" style="border-left:4px solid #5B8DEF;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color:#5B8DEF;">Total Komentar
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-gray-800">{{ $totalAll }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Komentar Toxic -->
+        <div class="col-xl-4 col-md-6 mb-3">
+            <div class="card shadow h-100 py-2" style="border-left:4px solid #e74a3b;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Komentar Toxic
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-gray-800">{{ $totalToxic }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-radiation fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div style="font-size:13.5px;color:#5a5f7a;line-height:1.6;margin-bottom:24px;">
-      Komentar ini akan dihapus secara permanen dan tidak dapat dipulihkan kembali.
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button type="button" onclick="closeDeleteModal()" style="background:#f7f8fc;border:1.5px solid #e0e4ef;border-radius:11px;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:700;color:#5a5f7a;cursor:pointer;transition:all .2s;">Batal</button>
-      <button type="button" id="deleteConfirmBtn" style="background:#f1523d;color:white;border:none;border-radius:11px;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;">Ya, Hapus</button>
-    </div>
-  </div>
-</div>
 
-<script>
-let _deleteFormId=null;
-function openDeleteModal(formId){
-  _deleteFormId=formId;
-  const m=document.getElementById('deleteModal');
-  m.style.opacity='1';m.style.pointerEvents='all';
-  document.getElementById('deleteModalBox').style.transform='scale(1)';
-}
-function closeDeleteModal(){
-  const m=document.getElementById('deleteModal');
-  m.style.opacity='0';m.style.pointerEvents='none';
-  document.getElementById('deleteModalBox').style.transform='scale(.95)';
-  _deleteFormId=null;
-}
-document.getElementById('deleteConfirmBtn').addEventListener('click',function(){
-  if(_deleteFormId) document.getElementById(_deleteFormId).submit();
-  closeDeleteModal();
-});
-</script>
+    <!-- Card Komentar -->
+    <div class="card shadow mb-4">
 
-{{-- ═══════════════════════════════════════════
-     PAGE CONTENT  (sistem tidak diubah)
-═══════════════════════════════════════════ --}}
+        <!-- Card Header: Filter Tabs -->
+        <div class="card-header py-3 d-flex align-items-center" style="background:#fff; border-bottom:1px solid #e3e6f0;">
+            <a href="{{ route('author.comment.index', ['filter' => 'all']) }}"
+                class="btn btn-sm mr-2 {{ $filter === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                <i class="fas fa-list mr-1"></i>Semua
+            </a>
+            <a href="{{ route('author.comment.index', ['filter' => 'toxic']) }}"
+                class="btn btn-sm {{ $filter === 'toxic' ? 'btn-danger' : 'btn-outline-danger' }}">
+                <i class="fas fa-radiation mr-1"></i>Toxic
+            </a>
+        </div>
 
-<h1 class="h3 mb-4">Komentar Pembaca</h1>
+        <!-- Card Body: Daftar Komentar -->
+        <div class="card-body p-0">
 
-<div class="card shadow">
-    <div class="card-body">
+            @forelse($comments as $comment)
+                <div class="px-4 py-4 border-bottom"
+                    style="{{ $comment->is_toxic ? 'background:#fff5f5;' : ($comment->is_hidden ? 'background:#fffbf0;' : '') }}">
 
-        @if($comments->count() > 0)
+                    <div class="d-flex align-items-start">
 
-            <div class="list-group">
+                        {{-- Strip warna kiri --}}
+                        <div class="mr-3 flex-shrink-0"
+                            style="width:4px; min-height:100px; border-radius:4px;
+                            background:{{ $comment->is_toxic ? '#e74a3b' : ($comment->is_hidden ? '#f6c23e' : '#5B8DEF') }};">
+                        </div>
 
-                @foreach($comments as $comment)
-                    <div class="list-group-item border-0 mb-3 shadow-sm rounded-3 p-4">
+                        {{-- Avatar --}}
+                        <div class="rounded-circle d-flex align-items-center justify-content-center
+                             text-white font-weight-bold mr-3 flex-shrink-0"
+                            style="width:44px; height:44px; font-size:16px;
+                            background:linear-gradient(135deg,#5B8DEF,#4A7BE0);">
+                            {{ strtoupper(substr($comment->user->name ?? 'U', 0, 1)) }}
+                        </div>
 
-                        <div class="d-flex justify-content-between">
+                        {{-- Konten utama --}}
+                        <div class="flex-grow-1" style="min-width:0;">
 
-                            {{-- KIRI --}}
-                            <div style="width:75%;">
+                            {{-- Nama + badge + info novel --}}
+                            <div class="d-flex flex-wrap align-items-center mb-1">
+                                <span class="font-weight-bold text-gray-800 mr-2" style="font-size:.9rem;">
+                                    {{ $comment->user->name ?? 'Pengguna' }}
+                                </span>
 
-                                <div class="d-flex align-items-center mb-2">
-                                    <h6 class="mb-0 fw-bold">
-                                        {{ $comment->user->name }}
-                                    </h6>
+                                @if ($comment->is_toxic)
+                                    <span class="badge mr-2" style="background:#fee2e2;color:#991b1b;font-size:.7rem;">
+                                        ☣️ Toxic
+                                    </span>
+                                @elseif($comment->is_hidden)
+                                    <span class="badge mr-2" style="background:#fef3c7;color:#92400e;font-size:.7rem;">
+                                        🙈 Tersembunyi
+                                    </span>
+                                @else
+                                    <span class="badge mr-2" style="background:#d1fae5;color:#065f46;font-size:.7rem;">
+                                        ✅ Publik
+                                    </span>
+                                @endif
 
-                                    <small class="text-muted ms-2">
-                                        • {{ $comment->created_at->diffForHumans() }}
-                                    </small>
+                                <small class="text-muted" style="font-size:.78rem;">
+                                    📖 <strong>{{ $comment->chapter->novel->judul ?? '-' }}</strong>
+                                    &middot; Bab {{ $comment->chapter->urutan ?? '-' }}
+                                    &middot; {{ $comment->created_at->diffForHumans() }}
+                                </small>
+                            </div>
 
-                                    @if($comment->created_at->diffInHours(now()) < 24)
-                                        <span class="badge bg-success ms-2">Baru</span>
+                            {{-- Alasan hidden --}}
+                            @if ($comment->hidden_reason)
+                                <div class="mb-2" style="display:inline-block;">
+                                    <span class="small px-2 py-1 rounded"
+                                        style="background:#fef3c7;color:#92400e;font-size:.78rem;">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Alasan: <strong>{{ $comment->hidden_reason }}</strong>
+                                    </span>
+                                </div>
+                            @endif
+
+                            {{-- Isi komentar --}}
+                            <div class="p-3 rounded mb-3"
+                                style="background:#f8f9fc; border:1px solid #e3e6f0;
+                                font-size:.9rem; line-height:1.65;
+                                {{ $comment->is_hidden ? 'opacity:.6;' : '' }}">
+                                {{ $comment->komentar }}
+                            </div>
+
+                            {{-- Preview reply --}}
+                            @if ($comment->replies->count() > 0)
+                                <div class="mb-3 pl-3" style="border-left:3px solid #e3e6f0;">
+                                    @foreach ($comment->replies->take(2) as $reply)
+                                        <div class="d-flex align-items-start mb-2">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center
+                                                 text-white font-weight-bold mr-2 flex-shrink-0"
+                                                style="width:26px; height:26px; font-size:10px;
+                                                background:{{ $reply->user_id === Auth::id() ? '#1cc88a' : '#858796' }};">
+                                                {{ strtoupper(substr($reply->user->name ?? 'U', 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <span class="font-weight-bold" style="font-size:.78rem; color:#5a5c69;">
+                                                    {{ $reply->user->name ?? 'User' }}
+                                                    @if ($reply->user_id === Auth::id())
+                                                        <span class="badge"
+                                                            style="background:#d1fae5;color:#065f46;font-size:.65rem;">
+                                                            Kamu
+                                                        </span>
+                                                    @endif
+                                                </span>
+                                                <p class="mb-0 text-muted" style="font-size:.8rem; line-height:1.5;">
+                                                    {{ Str::limit($reply->komentar, 90) }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    @if ($comment->replies->count() > 2)
+                                        <a href="{{ route('author.comments.show', $comment->id) }}"
+                                            class="text-decoration-none" style="font-size:.78rem; color:#5B8DEF;">
+                                            +{{ $comment->replies->count() - 2 }} balasan lainnya →
+                                        </a>
                                     @endif
                                 </div>
+                            @endif
 
-                                <div class="text-muted small mb-2">
-                                    <strong>Novel:</strong> {{ $comment->chapter->novel->judul }} |
-                                    <strong>Chapter:</strong> {{ $comment->chapter->judul_chapter }}
-                                </div>
+                            {{-- Quick reply form --}}
+                            <form method="POST" action="{{ route('author.comments.reply', $comment->id) }}" class="d-flex"
+                                style="gap:.5rem;">
+                                @csrf
+                                <input type="text" name="komentar" placeholder="Tulis balasan..." required
+                                    maxlength="1000" class="form-control form-control-sm"
+                                    style="font-size:.85rem; border-color:#d1d3e2; background:#f8f9fc;">
+                                <button type="submit" class="btn btn-sm btn-primary flex-shrink-0">
+                                    <i class="fas fa-reply mr-1"></i>Balas
+                                </button>
+                            </form>
 
-                                <div class="bg-light rounded-3 p-3">
-                                    {{ $comment->komentar }}
-                                </div>
+                        </div>
 
-                            </div>
+                        {{-- Tombol aksi (kanan) --}}
+                        <div class="ml-3 d-flex flex-column flex-shrink-0" style="gap:.4rem;">
 
-                            {{-- KANAN --}}
-                            <div style="width:150px;" class="text-end">
+                            <a href="{{ route('author.comments.show', $comment->id) }}"
+                                class="btn btn-sm btn-outline-secondary" title="Lihat detail & reply">
+                                <i class="fas fa-eye"></i>
+                            </a>
 
-                                <a href="{{ route('author.comment.show', $comment->id) }}"
-                                   class="btn btn-primary btn-sm w-100 mb-2">
-                                    💬 Balasan
-                                    <span class="badge bg-light text-dark ms-1">
-                                        {{ $comment->replies->count() }}
-                                    </span>
-                                </a>
-
-                                {{-- Form hapus — dipanggil lewat modal, bukan confirm() --}}
-                                <form id="delete-comment-{{ $comment->id }}"
-                                      action="{{ route('author.comment.destroy', $comment->id) }}"
-                                      method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button"
-                                            class="btn btn-danger btn-sm w-100"
-                                            onclick="openDeleteModal('delete-comment-{{ $comment->id }}')">
-                                        🗑 Hapus
+                            @if (!$comment->is_toxic)
+                                <form method="POST" action="{{ route('author.comments.toxic', $comment->id) }}"
+                                    onsubmit="return confirm('Tandai komentar ini sebagai toxic?\nKomentar akan otomatis disembunyikan dari reader.')">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="btn btn-sm btn-outline-warning w-100"
+                                        title="Tandai toxic">
+                                        <i class="fas fa-radiation"></i>
                                     </button>
                                 </form>
+                            @endif
 
-                            </div>
+                            <form method="POST" action="{{ route('author.comments.destroy', $comment->id) }}"
+                                onsubmit="return confirm('Hapus komentar ini PERMANEN?\nSemua balasannya juga akan ikut terhapus.')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100"
+                                    title="Hapus permanen">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
 
                         </div>
 
                     </div>
-                @endforeach
+                </div>
+            @empty
+                <div class="text-center py-5">
+                    <i class="fas fa-comments fa-3x mb-3" style="color:#d1d3e2;"></i>
+                    <p class="font-weight-bold text-gray-600 mb-1">Belum ada komentar</p>
+                    <small class="text-muted">Komentar dari reader akan muncul di sini</small>
+                </div>
+            @endforelse
 
+        </div>
+
+        {{-- Pagination --}}
+        @if ($comments->hasPages())
+            <div class="card-footer bg-white py-3 d-flex justify-content-center">
+                {{ $comments->links('pagination::bootstrap-4') }}
             </div>
-
-            {{-- PAGINATION --}}
-            <div class="mt-4">
-                {{ $comments->links('pagination::bootstrap-5') }}
-            </div>
-
-        @else
-
-            <div class="text-center text-muted py-4">
-                Belum ada komentar.
-            </div>
-
         @endif
 
     </div>
-</div>
 
 @endsection
