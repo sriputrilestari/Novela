@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Author;
 
 use App\Http\Controllers\Controller;
@@ -11,22 +10,22 @@ use Illuminate\Support\Facades\Auth;
 class ChapterController extends Controller
 {
     // LIST CHAPTER PER NOVEL
-   public function index($novel_id)
-{
-    $novel = Novel::where('id', $novel_id)
-        ->where('author_id', Auth::id())
-        ->firstOrFail();
+    public function index($novel_id)
+    {
+        $novel = Novel::where('id', $novel_id)
+            ->where('author_id', Auth::id())
+            ->firstOrFail();
 
-    $chapters = $novel->chapters()->orderBy('urutan')->get();
+        $chapters = $novel->chapters()->orderBy('urutan')->get();
 
-    $total = $chapters->count();
-    $published = $chapters->where('status','published')->count();
-    $draft = $chapters->where('status','draft')->count();
+        $total     = $chapters->count();
+        $published = $chapters->where('status', 'published')->count();
+        $draft     = $chapters->where('status', 'draft')->count();
 
-    return view('author.chapter.index', compact(
-        'novel','chapters','total','published','draft'
-    ));
-}
+        return view('author.chapter.index', compact(
+            'novel', 'chapters', 'total', 'published', 'draft'
+        ));
+    }
 
     // FORM CREATE
     public function create($novel_id)
@@ -51,11 +50,26 @@ class ChapterController extends Controller
             'content' => 'required',
         ]);
 
+        // tambah validasi status dulu
+        $request->validate([
+            'urutan'  => 'required|integer|min:1',
+            'title'   => 'required|string|max:255',
+            'content' => 'required',
+            'status'  => 'required|in:draft,published',
+        ]);
+
+        // auto-format paragraf
+        $content = collect(explode("\n", $request->content))
+            ->map(fn($l) => trim($l))
+            ->filter()
+            ->map(fn($l) => '<p>' . $l . '</p>')
+            ->implode("\n");
+
         $novel->chapters()->create([
             'urutan'        => $request->urutan,
             'judul_chapter' => $request->title,
-            'isi'           => $request->content,
-            'status'        => 'draft',
+            'isi'           => $content,
+            'status'        => $request->status,
         ]);
 
         return redirect()->route('author.chapter.index', $novel->id)
@@ -65,9 +79,11 @@ class ChapterController extends Controller
     // FORM EDIT
     public function edit(Novel $novel, Chapter $chapter)
     {
-        if ($novel->author_id !== Auth::id()) abort(403);
+        if ($novel->author_id !== Auth::id()) {
+            abort(403);
+        }
 
-        return view('author.chapter.edit', compact('novel','chapter'));
+        return view('author.chapter.edit', compact('novel', 'chapter'));
     }
 
     // UPDATE
@@ -86,12 +102,24 @@ class ChapterController extends Controller
             'title'   => 'required|string|max:255',
             'content' => 'required',
         ]);
+        $request->validate([
+            'urutan'  => 'required|integer|min:1',
+            'title'   => 'required|string|max:255',
+            'content' => 'required',
+            'status'  => 'required|in:draft,published',
+        ]);
+
+        $content = collect(explode("\n", $request->content))
+            ->map(fn($l) => trim($l))
+            ->filter()
+            ->map(fn($l) => '<p>' . $l . '</p>')
+            ->implode("\n");
 
         $chapter->update([
             'urutan'        => $request->urutan,
             'judul_chapter' => $request->title,
-            'isi'           => $request->content,
-            'status'        => $chapter->status ?? 'draft',
+            'isi'           => $content,
+            'status'        => $request->status,
         ]);
 
         return redirect()->route('author.chapter.index', $novel->id)

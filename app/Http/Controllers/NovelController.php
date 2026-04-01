@@ -11,20 +11,20 @@ class NovelController extends Controller
     public function index()
     {
         $novels = Novel::with('genre')->latest()->get();
-        return view('novels.index', compact('novels'));
+        return view('novela.index', compact('novels'));
     }
 
     // detail novel + chapter
     public function show($id)
     {
         $novel = Novel::with(['genre', 'chapters'])->findOrFail($id);
-        return view('novels.show', compact('novel'));
+        return view('novela.show', compact('novel'));
     }
 
     // filter novel per genre
     public function byGenre($genre_id)
     {
         $novels = Novel::where('genre_id', $genre_id)->get();
-        return view('novels.index', compact('novels'));
+        return view('novela.index', compact('novels'));
     }
 }

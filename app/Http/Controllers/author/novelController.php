@@ -28,7 +28,7 @@ class NovelController extends Controller
             $query->where('genre_id', $request->genre);
         }
 
-        $novels = $query->latest()->get();
+       $novels = $query->withCount(['bookmarks', 'chapters'])->latest()->get();
 
         $genres = Genre::all();
 

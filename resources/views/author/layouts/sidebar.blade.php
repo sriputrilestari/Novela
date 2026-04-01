@@ -41,6 +41,14 @@
         </a>
     </li>
 
+     <!-- Report -->
+    <li class="nav-item {{ request()->routeIs('author.comment.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('author.report.index') }}">
+            <i class="fas fa-fw fa-flag"></i>
+            <span>Novel Report</span>
+        </a>
+    </li>
+
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">

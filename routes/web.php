@@ -1,29 +1,30 @@
 <?php
 
+//admin
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthorController as AdminAuthorController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\NovelController as AdminNovelController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ReaderController;
-
-// Admin
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
+
+//author
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Author\ChapterController as AuthorChapterController;
 use App\Http\Controllers\Author\CommentController as AuthorCommentController;
 use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
 use App\Http\Controllers\Author\NovelController as AuthorNovelController;
 use App\Http\Controllers\Author\ProfileController as AuthorProfileController;
+use App\Http\Controllers\Author\ReportController as AuthorReportController;
 
-// Author
+// reader
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\NovelController;
 use App\Http\Controllers\Reader\AuthorRequestController;
 use App\Http\Controllers\ReadingHistoryController;
-
-// Reader
+use App\Http\Controllers\Reader\ProfileController as ReaderProfileController;
 use Illuminate\Support\Facades\Route;
 
 // ------------------------
@@ -125,7 +126,7 @@ Route::middleware(['auth', 'role:author'])
         Route::post('/novels', [AuthorNovelController::class, 'store'])->name('novel.store');
         Route::get('/novels/{id}/edit', [AuthorNovelController::class, 'edit'])->name('novel.edit');
         Route::put('/novels/{id}', [AuthorNovelController::class, 'update'])->name('novel.update');
-        Route::delete('/author/novel/{novel}', [AuthorNovelController::class, 'destroy'])->name('novel.destroy');
+        Route::delete('/novel/{novel}', [AuthorNovelController::class, 'destroy'])->name('novel.destroy');
 
         // Chapters per Novel
         Route::get('/novels/{novel}/chapters', [AuthorChapterController::class, 'index'])->name('chapter.index');
@@ -152,6 +153,9 @@ Route::middleware(['auth', 'role:author'])
         Route::post('/profile', [AuthorProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/password', [AuthorProfileController::class, 'updatePassword'])->name('profile.password');
 
+        // Report
+        Route::get('/reports', [AuthorReportController::class, 'index'])->name('report.index');
+        Route::get('/reports/{id}', [AuthorReportController::class, 'show'])->name('report.show');
     });
 
 // ------------------------

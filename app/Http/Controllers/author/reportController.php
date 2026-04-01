@@ -1,68 +1,49 @@
 <?php
-// ============================================================
-// FILE: app/Http/Controllers/Reader/ReportController.php
-// Buat folder Reader dulu jika belum ada.
-// ============================================================
+// app/Http/Controllers/Author/ReportController.php
 
-namespace App\Http\Controllers\Reader;
+namespace App\Http\Controllers\Author;
 
 use App\Http\Controllers\Controller;
 use App\Models\Novel;
 use App\Models\NovelReport;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
-    // ──────────────────────────────────────────────────────────
-    // STORE — Reader kirim laporan novel
-    // POST /novels/{novel_id}/report
-    // ──────────────────────────────────────────────────────────
-    public function store(Request $request, $novelId)
+    // Daftar semua report masuk ke semua novel milik author
+    public function index()
     {
-        $request->validate([
-            'alasan'     => 'required|in:konten_dewasa,ujaran_kebencian,spam,plagiarisme,kekerasan,lainnya',
-            'deskripsi'  => 'nullable|string|max:1000',
-            'comment_id' => 'nullable|exists:comments,id',
-        ]);
+        $novels = Novel::where('author_id', Auth::id())->pluck('id');
 
-        $novel = Novel::findOrFail($novelId);
+        $reports = NovelReport::with(['novel', 'user'])
+            ->whereIn('novel_id', $novels)
+            ->latest()
+            ->paginate(15);
 
-        // ── Cek 1: Reader tidak bisa report novel milik dirinya sendiri ──
-        if ($novel->author_id === Auth::id()) {
-            return back()->with('error', 'Kamu tidak dapat melaporkan novel milik sendiri.');
-        }
+        $stats = [
+            'total' => NovelReport::whereIn('novel_id', $novels)->count(),
+            'pending' => NovelReport::whereIn('novel_id', $novels)->where('status', 'pending')->count(),
+            'ditinjau' => NovelReport::whereIn('novel_id', $novels)->where('status', 'ditinjau')->count(),
+            'selesai' => NovelReport::whereIn('novel_id', $novels)->where('status', 'selesai')->count(),
+            'ditolak' => NovelReport::whereIn('novel_id', $novels)->where('status', 'ditolak')->count(),
+        ];
 
-        // ── Cek 2: Novel ini sudah pernah dilaporkan oleh user ini ──
-        $sudahReport = NovelReport::where('user_id', Auth::id())
-            ->where('novel_id', $novelId)
-            ->exists();
+        // Bookmark count per novel
+        $novelStats = Novel::where('author_id', Auth::id())
+            ->withCount(['chapters', 'bookmarks'])
+            ->get();
 
-        if ($sudahReport) {
-            return back()->with('error', 'Kamu sudah pernah melaporkan novel ini sebelumnya.');
-        }
+        return view('author.report.index', compact('reports', 'stats', 'novelStats'));
+    }
 
-        // ── Cek 3: Rate limit — max 2 novel berbeda per 7 hari ──
-        if (NovelReport::reachedWeeklyLimit(Auth::id())) {
-            $resetAt  = NovelReport::quotaResetsAt(Auth::id());
-            $resetStr = $resetAt ? $resetAt->translatedFormat('d F Y, H:i') : '-';
+    // Detail 1 report
+    public function show($id)
+    {
+        $novels = Novel::where('author_id', Auth::id())->pluck('id');
+        $report = NovelReport::with(['novel', 'user', 'comment'])
+            ->whereIn('novel_id', $novels)
+            ->findOrFail($id);
 
-            return back()->with('error',
-                "Kamu sudah melaporkan 2 novel dalam 7 hari terakhir. " .
-                "Kuota reset pada: {$resetStr}."
-            );
-        }
-
-        // ── Simpan laporan ──
-        NovelReport::create([
-            'user_id'    => Auth::id(),
-            'novel_id'   => $novelId,
-            'comment_id' => $request->comment_id,
-            'alasan'     => $request->alasan,
-            'deskripsi'  => $request->deskripsi,
-            'status'     => 'pending',
-        ]);
-
-        return back()->with('success', 'Laporan kamu berhasil dikirim. Terima kasih!');
+        return view('author.report.show', compact('report'));
     }
 }
