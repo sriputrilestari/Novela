@@ -1,146 +1,68 @@
 <?php
-
 namespace App\Http\Controllers\Reader;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class AuthorRequestController extends Controller
 {
-    /**
-     * Show author request form
-     */
     public function index()
     {
-        // Check if user already an author
-        if (Auth::user()->role === 'author') {
-            return redirect()->route('home')->with('info', 'Anda sudah menjadi author.');
-        }
-
-        return view('reader.author-request');
+        $user = Auth::user();
+        return view('reader.author-request', compact('user'))->with('currentUser', $user);
     }
 
-    /**
-     * Submit author request
-     */
     public function submit(Request $request)
     {
-        $user = Auth::user();
-
-        // Validate user role
-        if ($user->role !== 'reader') {
-            return redirect()->route('home')->with('error', 'Hanya reader yang dapat mengajukan menjadi author.');
-        }
-
-        // Check if already has pending request
-        if ($user->author_request === 'pending') {
-            return redirect()->back()->with('error', 'Anda sudah memiliki pengajuan yang sedang diproses.');
-        }
-
-        // Validate request
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'author_request_note' => 'required|string|min:50|max:1000',
-            'agree' => 'required|accepted',
+        $request->validate([
+            'pen_name'         => 'required|string|max:255',
+            'sinopsis_pertama' => 'required|string|min:50|max:500',
+            'pengalaman'       => 'nullable|string',
+            'motivasi'         => 'nullable|string|max:1000',
+            'setuju'           => 'accepted',
         ], [
-            'name.required' => 'Nama wajib diisi',
-            'author_request_note.required' => 'Alasan wajib diisi',
-            'author_request_note.min' => 'Alasan minimal 50 karakter',
-            'author_request_note.max' => 'Alasan maksimal 1000 karakter',
-            'agree.required' => 'Anda harus menyetujui syarat dan ketentuan',
-            'agree.accepted' => 'Anda harus menyetujui syarat dan ketentuan',
+            'pen_name.required'         => 'Nama pena wajib diisi.',
+            'sinopsis_pertama.required' => 'Sinopsis novel pertama wajib diisi.',
+            'sinopsis_pertama.min'      => 'Sinopsis minimal 50 karakter.',
+            'setuju.accepted'           => 'Kamu harus menyetujui syarat dan ketentuan.',
         ]);
 
-        try {
-            // Update user
-            $user->update([
-                'name' => $validated['name'],
-                'author_request' => 'pending',
-                'author_request_date' => now(),
-                'author_request_note' => $validated['author_request_note'],
-            ]);
+        $user = Auth::user();
 
-            // Send notification to admin (optional)
-            // Notification::send(User::where('role', 'admin')->get(), new NewAuthorRequest($user));
-
-            return redirect()
-                ->route('reader.author-request')
-                ->with('success', 'Pengajuan berhasil dikirim! Tim kami akan segera meninjau pengajuan Anda.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        // Cek apakah sudah punya request yang pending
+        if ($user->author_request && $user->author_request->status === 'pending') {
+            return back()->with('error', 'Kamu sudah memiliki permintaan yang sedang ditinjau.');
         }
+
+        // Simpan request ke tabel reports (atau bisa buat tabel author_requests sendiri)
+        // Menggunakan field yang ada di model user (author_request)
+        // Untuk sementara update field author_request = 1 sebagai tanda sudah request
+        $user->update([
+            'author_request' => 1,
+        ]);
+
+        // Kirim notifikasi ke admin (opsional, bisa via event/notification)
+        // event(new AuthorRequested($user, $request->all()));
+
+        return back()->with('success', 'Permintaan berhasil dikirim! Tim kami akan meninjau dalam 1–3 hari kerja.');
     }
 
-    /**
-     * Reapply after rejection
-     */
     public function reapply(Request $request)
     {
         $user = Auth::user();
+        $user->update(['author_request' => 0]);
 
-        // Validate user can reapply
-        if ($user->role !== 'reader') {
-            return redirect()->route('home')->with('error', 'Hanya reader yang dapat mengajukan menjadi author.');
-        }
-
-        if ($user->author_request !== 'rejected') {
-            return redirect()->back()->with('error', 'Anda tidak dapat mengajukan ulang saat ini.');
-        }
-
-        // Validate request
-        $validated = $request->validate([
-            'author_request_note' => 'required|string|min:50|max:1000',
-        ], [
-            'author_request_note.required' => 'Alasan wajib diisi',
-            'author_request_note.min' => 'Alasan minimal 50 karakter',
-            'author_request_note.max' => 'Alasan maksimal 1000 karakter',
-        ]);
-
-        try {
-            // Reset and reapply
-            $user->update([
-                'author_request' => 'pending',
-                'author_request_date' => now(),
-                'author_request_note' => $validated['author_request_note'],
-                'author_rejected_at' => null,
-            ]);
-
-            return redirect()
-                ->route('reader.author-request')
-                ->with('success', 'Pengajuan ulang berhasil dikirim!');
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        return redirect()->route('reader.author-request')
+            ->with('success', 'Kamu bisa mengisi form pengajuan ulang sekarang.');
     }
 
-    /**
-     * Cancel pending request
-     */
-    public function cancel()
+    public function cancel(Request $request)
     {
         $user = Auth::user();
+        $user->update(['author_request' => 0]);
 
-        if ($user->author_request !== 'pending') {
-            return redirect()->back()->with('error', 'Tidak ada pengajuan yang dapat dibatalkan.');
-        }
-
-        try {
-            $user->update([
-                'author_request' => 'none',
-                'author_request_date' => null,
-                'author_request_note' => null,
-            ]);
-
-            return redirect()
-                ->route('home')
-                ->with('success', 'Pengajuan berhasil dibatalkan.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        return back()->with('success', 'Permintaan berhasil dibatalkan.');
     }
 }

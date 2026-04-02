@@ -1,0 +1,331 @@
+/* ============================================================
+   NOVELA – PAGE-SPECIFIC STYLES
+   Setiap section berisi style khusus untuk halaman tertentu.
+   ============================================================ */
+
+/* ──────────────────────────────────────
+   HOME — HERO BANNER
+────────────────────────────────────── */
+.hero-banner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #060c28 0%, #0d1845 50%, #060c28 100%);
+  padding: 60px 40px;
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+}
+.hero-bg-img {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 55%;
+  background: linear-gradient(135deg, #0d1845, #1a2a7a, #0d1845);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8rem;
+  opacity: 0.3;
+}
+.hero-bg-art {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 55%;
+  background: linear-gradient(to left, rgba(11, 18, 48, 0), rgba(11, 18, 48, 0.95));
+  z-index: 1;
+}
+.hero-content { position: relative; z-index: 2; max-width: 560px; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(79, 124, 255, 0.15);
+  border: 1px solid rgba(79, 124, 255, 0.35);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #fff, #8aa4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-author { color: var(--text-soft); font-size: 0.875rem; margin-bottom: 8px; }
+.hero-desc {
+  color: var(--text-soft);
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.hero-stars { color: var(--star); }
+.hero-tag {
+  background: rgba(123, 90, 240, 0.2);
+  border: 1px solid rgba(123, 90, 240, 0.4);
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  color: #b094f5;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ──────────────────────────────────────
+   NOVEL DETAIL PAGE
+────────────────────────────────────── */
+.detail-hero {
+  background: linear-gradient(135deg, #080f2e, #10195e, #080f2e);
+  padding: 40px 40px 0;
+  position: relative;
+  overflow: hidden;
+}
+.detail-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--bg-void));
+}
+.detail-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  gap: 36px;
+  align-items: flex-start;
+}
+.detail-cover {
+  flex-shrink: 0;
+  width: 200px;
+  height: 300px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  border: 2px solid var(--border-light);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 1;
+  margin-bottom: -40px;
+}
+.detail-info       { flex: 1; padding-top: 8px; position: relative; z-index: 1; }
+.detail-genre-row  { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.detail-title {
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #fff, #8aa4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.detail-author-row   { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.detail-author-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+}
+.detail-stats-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+.detail-stat      { display: flex; align-items: center; gap: 5px; font-size: 0.82rem; color: var(--text-soft); }
+.detail-actions   { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.synopsis-text {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.1rem;
+  line-height: 1.85;
+  color: var(--text-soft);
+  max-width: 720px;
+}
+
+/* ──────────────────────────────────────
+   READER PAGE
+────────────────────────────────────── */
+.reader-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+.reader-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.reader-novel-info  { flex: 1; min-width: 0; }
+.reader-novel-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2px; }
+.reader-chapter-title { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 600; }
+.reader-controls { display: flex; align-items: center; gap: 8px; }
+
+/* Settings panel */
+.reader-settings-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  display: none;
+}
+.reader-settings-panel.open { display: block; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.settings-label { font-size: 0.875rem; color: var(--text-soft); }
+
+.font-size-controls { display: flex; align-items: center; gap: 10px; }
+.font-size-btn {
+  background: var(--bg-mid);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-white); font-size: 1rem;
+  transition: all 0.2s;
+}
+.font-size-btn:hover { border-color: var(--accent); }
+.font-size-val { font-size: 0.875rem; color: var(--accent); min-width: 32px; text-align: center; }
+
+.theme-btns { display: flex; gap: 6px; }
+.theme-swatch {
+  width: 30px; height: 30px; border-radius: 6px;
+  cursor: pointer; border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+.theme-swatch.active { border-color: var(--accent); }
+
+/* Reading content */
+.reader-content {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.2rem;
+  line-height: 2;
+  color: var(--text-soft);
+  margin-bottom: 40px;
+}
+.reader-content p { margin-bottom: 1.5em; }
+.reader-content p:first-child::first-letter {
+  font-family: 'Cinzel', serif;
+  font-size: 3em;
+  float: left;
+  line-height: 1;
+  margin: 0 8px 0 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Nav bar */
+.reader-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+}
+.reader-progress { flex: 1; margin: 0 20px; }
+.progress-label  { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-align: center; }
+.progress-bar    { height: 4px; background: var(--bg-mid); border-radius: 2px; overflow: hidden; }
+.progress-fill   { height: 100%; background: linear-gradient(to right, var(--accent), var(--accent2)); border-radius: 2px; }
+
+/* ──────────────────────────────────────
+   PROFILE PAGE
+────────────────────────────────────── */
+.profile-header {
+  background: linear-gradient(135deg, #080f2e, #10195e);
+  padding: 40px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.profile-avatar-wrap { position: relative; display: inline-block; margin-bottom: 16px; }
+.profile-avatar {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: 3px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; font-weight: 700; margin: 0 auto;
+  box-shadow: 0 0 30px var(--accent-glow);
+}
+.avatar-change-btn {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-void);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #fff; font-size: 0.75rem;
+}
+.profile-name   { font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+.profile-email  { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 16px; }
+.profile-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.profile-badge {
+  background: rgba(79, 124, 255, 0.15);
+  border: 1px solid rgba(79, 124, 255, 0.3);
+  border-radius: 16px; padding: 4px 12px;
+  font-size: 0.78rem; color: var(--accent);
+  display: flex; align-items: center; gap: 5px;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.profile-stat     { background: var(--bg-deep); padding: 20px; text-align: center; }
+.profile-stat-num { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--accent); }
+.profile-stat-lbl { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+
+.profile-section  { padding: 28px 40px; max-width: 700px; margin: 0 auto; }
+.profile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.profile-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+.profile-card-body { padding: 20px; }
+
+/* ──────────────────────────────────────
+   REPORT FORM
+────────────────────────────────────── */
+.report-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 640px;
+}
+
+/* ──────────────────────────────────────
+   RESPONSIVE — PAGE OVERRIDES
+────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero-banner      { padding: 32px 20px; }
+  .hero-title       { font-size: 1.8rem; }
+  .detail-inner     { flex-direction: column; }
+  .detail-cover     { width: 140px; height: 210px; margin-bottom: -20px; }
+  .reader-wrap      { padding: 20px 16px; }
+  .profile-section  { padding: 20px 16px; }
+  .profile-header   { padding: 24px 16px; }
+}

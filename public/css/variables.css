@@ -1,0 +1,46 @@
+/* ============================================================
+   NOVELA – DESIGN TOKENS
+   Semua warna, ukuran, dan nilai dasar ada di sini.
+   Kalau mau ganti tema, cukup edit file ini saja.
+   ============================================================ */
+
+:root {
+  /* ── Background ── */
+  --bg-void:    #04071a;
+  --bg-deep:    #070c24;
+  --bg-dark:    #0b1230;
+  --bg-mid:     #101840;
+  --bg-card:    #141e4a;
+  --bg-hover:   #1a2660;
+
+  /* ── Accent / Brand ── */
+  --accent:          #4f7cff;
+  --accent2:         #7b5af0;
+  --accent-glow:     rgba(79, 124, 255, 0.35);
+  --accent2-glow:    rgba(123, 90, 240, 0.3);
+
+  /* ── Semantic ── */
+  --gold:       #c9a84c;
+  --gold-light: #f0d080;
+  --red:        #e8445a;
+  --green:      #3dd68c;
+  --star:       #f5c842;
+  --orange:     #f5a05a;
+
+  /* ── Typography ── */
+  --text-white: #eef2ff;
+  --text-soft:  #a8b4d8;
+  --text-muted: #5a6899;
+
+  /* ── Borders ── */
+  --border:       #1e2d60;
+  --border-light: #2a3d80;
+
+  /* ── Shape ── */
+  --radius:    12px;
+  --radius-lg: 18px;
+
+  /* ── Shadow ── */
+  --shadow:      0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(79, 124, 255, 0.2);
+}
