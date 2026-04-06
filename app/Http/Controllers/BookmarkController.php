@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Bookmark;
@@ -19,10 +18,20 @@ class BookmarkController extends Controller
         }
 
         Bookmark::create([
-            'user_id' => Auth::id(),
-            'novel_id' => $novel_id
+            'user_id'  => Auth::id(),
+            'novel_id' => $novel_id,
         ]);
 
         return back()->with('success', 'Novel dibookmark');
+    }
+
+    // ✅ TAMBAHAN
+    public function index()
+    {
+        $bookmarks = Bookmark::with('novel')
+            ->where('user_id', Auth::id())
+            ->get();
+
+        return view('pages.favorites', compact('bookmarks')); 
     }
 }

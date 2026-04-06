@@ -1,87 +1,38 @@
-@extends('layouts.main')
-
-@section('title', 'Chapter ' . ($chapter->urutan ?? 218) . ' – ' . ($chapter->novel->judul ?? 'Moonlit Sorceress'))
-
-@section('extra-css')
-    <style>
-        body {
-            background: #fdf9f5
-        }
-
-        .reader-wrap {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 0 20px 120px
-        }
-
-        #reader-content {
-            font-family: 'Lora', serif;
-            font-size: 1.1rem;
-            color: var(--ink);
-            line-height: 1.95;
-            padding: 32px 0;
-            transition: all .3s
-        }
-
-        #reader-content p {
-            margin-bottom: 1.6em
-        }
-
-        .reader-topbar {
-            top: 64px;
-            padding: 10px 20px
-        }
-    </style>
-@endsection
+@extends('layouts.app')
+@section('title', 'Ch.' . $chapter->urutan . ' – ' . $chapter->novel->judul)
 
 @section('content')
 
-    <div class="reader-topbar">
-        <div class="reader-topbar-inner"
-            style="max-width:700px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-            <div style="min-width:0">
-                <a href="{{ route('novel.show', $chapter->novel_id ?? 1) }}"
-                    style="display:inline-flex;align-items:center;gap:5px;font-size:.78rem;color:var(--ink-3);background:var(--bg);padding:4px 10px;border-radius:8px;margin-bottom:6px;text-decoration:none;transition:all .15s"
-                    onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--ink-3)'">
-                    ← Kembali ke Novel
-                </a>
-                <div class="reader-novel-title">{{ $chapter->novel->judul ?? 'Moonlit Sorceress' }}</div>
-                <div class="reader-chapter-title">Chapter {{ $chapter->urutan ?? 218 }}:
-                    {{ $chapter->judul_chapter ?? 'Pertempuran Akhir' }}</div>
+    {{-- ═══ READER TOPBAR ═══ --}}
+    <div class="reader-topbar"
+        style="position:sticky;top:64px;z-index:90;background:rgba(7,12,36,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 40px">
+        <div
+            style="max-width:760px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div>
+                <a href="{{ route('novel.show', $chapter->novel->id) }}" style="font-size:.78rem;color:var(--text-muted)">←
+                    Kembali ke Novel</a>
+                <div style="font-size:.8rem;color:var(--text-muted);margin-top:4px">{{ $chapter->novel->judul }}</div>
+                <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:600">
+                    Chapter {{ $chapter->urutan }}: {{ $chapter->judul_chapter }}
+                </div>
             </div>
-            <div class="reader-controls">
-                <button class="icon-btn" onclick="toggleSettings()" title="Pengaturan Tampilan">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3" />
-                        <path
-                            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-                    </svg>
-                </button>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;position:relative">
+                <button class="icon-btn" onclick="toggleSettings()" title="Pengaturan">⚙</button>
                 @auth
-                    <form action="{{ route('bookmark.toggle', $chapter->novel_id ?? 1) }}" method="POST"
-                        style="display:inline">
+                    <form method="POST" action="{{ route('bookmark.toggle', $chapter->novel->id) }}" style="display:inline">
                         @csrf
-                        <button type="submit" class="icon-btn" title="Favorit">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                                fill="{{ $isBookmarked ?? false ? 'var(--blue)' : 'none' }}" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
+                        <button type="submit" class="icon-btn" title="{{ $isBookmarked ? 'Hapus Bookmark' : 'Bookmark' }}">
+                            {{ $isBookmarked ? '🔖' : '🔗' }}
                         </button>
                     </form>
                 @endauth
-                <button class="icon-btn" onclick="openModal('report-modal')" title="Laporkan">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                    </svg>
-                </button>
+                {{-- ✅ Trigger modal report --}}
+                <button class="icon-btn" onclick="openModal('report-modal')" title="Laporkan Novel">🚩</button>
             </div>
         </div>
     </div>
 
+    {{-- ═══ READER WRAP ═══ --}}
     <div class="reader-wrap">
 
         {{-- Settings Panel --}}
@@ -94,191 +45,174 @@
                     <button class="font-size-btn" onclick="changeFontSize(1)">A+</button>
                 </div>
             </div>
-            <div class="settings-row mb-16">
+            <div class="settings-row">
                 <div class="settings-label">Tema Baca</div>
                 <div class="theme-btns">
-                    <div class="theme-swatch" style="background:#fdf9f5;border:1.5px solid var(--line)"
+                    <div class="theme-swatch" style="background:#fdf9f5;border:1.5px solid #ddd"
                         onclick="setReadTheme('cream',this)" title="Krem"></div>
-                    <div class="theme-swatch active" style="background:#ffffff;border:1.5px solid var(--line)"
+                    <div class="theme-swatch active" style="background:#fff;border:1.5px solid #ddd"
                         onclick="setReadTheme('white',this)" title="Putih"></div>
                     <div class="theme-swatch" style="background:#1a1a2e" onclick="setReadTheme('midnight',this)"
                         title="Midnight"></div>
-                    <div class="theme-swatch" style="background:#04071a" onclick="setReadTheme('dark',this)" title="Gelap">
-                    </div>
-                </div>
-            </div>
-            <div class="settings-row">
-                <div class="settings-label">Lebar Konten</div>
-                <div class="font-size-controls">
-                    <button class="font-size-btn" onclick="changeWidth(-40)">←→</button>
-                    <span class="font-size-val" id="width-display">700px</span>
-                    <button class="font-size-btn" onclick="changeWidth(40)">← →</button>
+                    <div class="theme-swatch" style="background:#04071a;border:1px solid var(--border)"
+                        onclick="setReadTheme('dark',this)" title="Gelap"></div>
                 </div>
             </div>
         </div>
 
-        {{-- Chapter Content --}}
-        <div id="reader-content">
+        {{-- Flash message --}}
+        @if (session('success'))
+            <div
+                style="background:#e0faf5;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#00a08a;font-weight:600;">
+                ✅ {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div
+                style="background:#fef0ee;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#c43020;font-weight:600;">
+                ⚠️ {{ session('error') }}
+            </div>
+        @endif
+
+        {{-- ═══ ISI CHAPTER ═══ --}}
+        <div id="reader-content"
+            style="font-family:'Crimson Pro',serif;font-size:18px;line-height:2;color:var(--text-soft);padding:32px 0;transition:all .3s">
             <h2
-                style="font-family:'Lora',serif;font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:28px;line-height:1.3">
-                Chapter {{ $chapter->urutan ?? 218 }}: {{ $chapter->judul_chapter ?? 'Pertempuran Akhir' }}
+                style="font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;margin-bottom:28px;color:var(--text-white)">
+                Chapter {{ $chapter->urutan }}: {{ $chapter->judul_chapter }}
             </h2>
+            {!! nl2br(e($chapter->isi)) !!}
 
-            @if (isset($chapter->isi))
-                {!! nl2br(e($chapter->isi)) !!}
-            @else
-                {{-- Demo content --}}
-                <p>Malam itu, langit terasa lebih berat dari biasanya. Lunara berdiri di tepi jurang Teluk Bintang,
-                    memandang lautan awan di bawahnya yang berputar seperti mimpi buruk yang tak pernah berakhir. Angin
-                    membawa bisikan-bisikan yang tidak sepenuhnya terdengar oleh telinga biasa.</p>
-                <p>"Kamu tahu mereka akan datang," suara Orion terdengar dari balik bayangannya—tenang, seperti kolam malam
-                    yang sempurna. "Kenapa kamu masih diam di sini?"</p>
-                <p>Lunara menggenggam tongkat kristalnya lebih erat. Cahaya bulan mengalir melalui ujungnya, membentuk
-                    spiral perak yang perlahan-lahan menyebar ke tanah di bawah kakinya. Ini adalah kekuatan yang belum
-                    pernah ia rasakan sepenuhnya—terlalu besar, terlalu lapar, terlalu purba untuk dikandung oleh satu tubuh
-                    manusia.</p>
-                <p>"Karena kalau aku bergerak," jawabnya akhirnya, "mereka akan tahu aku takut."</p>
-                <p>Orion melangkah keluar dari bayangan. Di bawah sinar bulan, bekas luka di wajahnya berkilau seperti tanda
-                    bintang—pengingat dari perang yang tidak pernah benar-benar berakhir. Matanya—seperti langit dalam malam
-                    tanpa bintang—menatapnya dengan intensitas yang membuat Lunara merasa diselami.</p>
-                <p>"Takut bukan kelemahan," katanya pelan. "Takut adalah bukti bahwa kamu mengerti apa yang dipertaruhkan."
-                </p>
-                <p>Di kejauhan, terdengar suara gemuruh. Pasukan Kegelapan telah menemukan mereka. Dan kali ini, tidak ada
-                    tempat untuk bersembunyi.</p>
-                <p>Lunara menutup matanya. Di balik kelopak matanya, ia melihat semua wajah yang bergantung padanya—penduduk
-                    desa yang dilindunginya, anak-anak yang tertawa bebas di bawah langit yang seharusnya aman. Untuk mereka
-                    semua, ia harus berdiri.</p>
-                <p>Ketika ia membuka matanya kembali, ada api baru yang menyala di dalam iris birunya. Tongkat kristal
-                    bersinar lebih terang dari sebelumnya—cahaya bulan yang murni, tidak tergoyahkan, abadi.</p>
-                <p>"Baiklah," bisiknya kepada angin. "Aku akan tunjukkan pada mereka apa artinya melawan cahaya bulan."</p>
-            @endif
-        </div>
-
-        {{-- End of chapter --}}
-        <div
-            style="text-align:center;padding:32px 0;border-top:2px dashed var(--line);border-bottom:2px dashed var(--line);margin:32px 0">
-            <div style="font-size:1.5rem;margin-bottom:8px">✦</div>
-            <div style="font-family:'Lora',serif;font-size:1rem;color:var(--ink-3)">Akhir Chapter
-                {{ $chapter->urutan ?? 218 }}</div>
-        </div>
-
-        {{-- COMMENT SECTION --}}
-        <div style="margin-top:32px">
-            <div style="font-family:'Lora',serif;font-size:1.1rem;font-weight:700;margin-bottom:16px">💬 Komentar Chapter
+            <div
+                style="text-align:center;padding:32px 0;border-top:2px dashed var(--border);border-bottom:2px dashed var(--border);margin:32px 0">
+                <div style="font-size:1.5rem;margin-bottom:8px">✦</div>
+                <div style="font-family:'Crimson Pro',serif;font-size:1rem;color:var(--text-muted)">Akhir Chapter
+                    {{ $chapter->urutan }}</div>
             </div>
+        </div>
+
+        {{-- ═══ KOMENTAR ═══ --}}
+        <div style="margin-top:32px">
+            <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:700;margin-bottom:16px">💬 Komentar
+                ({{ $comments->count() }})</div>
 
             @auth
                 <div class="comment-box">
-                    <form action="/comment" method="POST">
+                    <form method="POST" action="/comment">
                         @csrf
-                        <input type="hidden" name="chapter_id" value="{{ $chapter->id ?? 1 }}" />
+                        <input type="hidden" name="chapter_id" value="{{ $chapter->id }}" />
                         <textarea class="comment-input" name="komentar" placeholder="Bagaimana pendapatmu tentang chapter ini?..." required></textarea>
                         <div class="comment-actions">
-                            <button type="submit" class="btn-primary btn-sm">Kirim Komentar</button>
+                            <button type="submit" class="btn-primary" style="font-size:.82rem;padding:8px 16px">Kirim</button>
                         </div>
                     </form>
                 </div>
             @else
-                <div
-                    style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:14px;padding:16px;text-align:center;margin-bottom:20px">
-                    <a href="{{ route('login') }}" class="btn-primary btn-sm">Login untuk berkomentar</a>
+                <div class="comment-box">
+                    <p class="text-muted text-sm"><a href="{{ route('login') }}" style="color:var(--accent)">Masuk</a> untuk
+                        berkomentar.</p>
                 </div>
             @endauth
 
-            @forelse($comments ?? [] as $comment)
+            @forelse($comments as $comment)
                 <div class="comment-item">
                     <div class="comment-avatar">{{ strtoupper(substr($comment->user->name, 0, 1)) }}</div>
                     <div class="comment-body">
-                        <div class="comment-user">{{ $comment->user->name }} <span
-                                class="comment-time">{{ \Carbon\Carbon::parse($comment->created_at)->diffForHumans() }}</span>
+                        <div class="comment-user">
+                            {{ $comment->user->name }}
+                            <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
                         <div class="comment-text">{{ $comment->komentar }}</div>
-                        <div class="comment-actions-row">
-                            <button class="comment-action-btn" onclick="likeComment(this)">👍 <span>0</span></button>
-                            <button class="comment-action-btn">💬 Balas</button>
-                            <button class="comment-action-btn" style="color:var(--red)">🚩 Laporkan</button>
-                        </div>
                     </div>
                 </div>
             @empty
-                <div style="text-align:center;padding:32px;color:var(--ink-3)">
-                    <div style="font-size:2rem;margin-bottom:8px">💬</div>
-                    <div class="text-sm">Belum ada komentar. Jadilah yang pertama!</div>
+                <div class="empty-state" style="padding:24px 0">
+                    <p>Belum ada komentar. Jadilah yang pertama!</p>
                 </div>
             @endforelse
         </div>
-    </div>
 
-    {{-- READER NAVIGATION --}}
-    <div class="reader-nav">
-        @if (isset($prevChapter))
-            <a href="{{ route('chapter.show', $prevChapter->id) }}" class="btn-outline">
-                ← Ch.{{ $prevChapter->urutan }}
-            </a>
+    </div>{{-- /reader-wrap --}}
+
+    {{-- ═══ READER NAV (fixed bottom) ═══ --}}
+    <div
+        style="position:fixed;bottom:0;left:0;right:0;z-index:90;background:rgba(7,12,36,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 40px">
+        @if ($prevChapter)
+            <a href="{{ route('chapter.show', $prevChapter->id) }}" class="btn-outline">←
+                Ch.{{ $prevChapter->urutan }}</a>
         @else
-            <button class="btn-ghost" disabled style="opacity:.4">← Prev</button>
+            <button class="btn-outline" disabled style="opacity:.4">← Awal</button>
         @endif
 
-        <div class="reader-progress" style="flex:1">
-            <div class="progress-label">Chapter {{ $chapter->urutan ?? 218 }} / {{ $totalChapters ?? 320 }} · <span
-                    id="read-pct">0%</span> selesai</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        <div style="flex:1;margin:0 24px">
+            <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:5px;text-align:center">
+                Chapter {{ $chapter->urutan }} / {{ $totalChapters }} · <span id="read-pct">0%</span> selesai
+            </div>
+            <div style="height:4px;background:var(--bg-mid);border-radius:2px;overflow:hidden">
+                <div id="progress-fill"
+                    style="height:100%;background:linear-gradient(to right,var(--accent),var(--accent2));border-radius:2px;width:0%;transition:width .3s">
+                </div>
             </div>
         </div>
 
-        @if (isset($nextChapter))
-            <a href="{{ route('chapter.show', $nextChapter->id) }}" class="btn-primary">
-                Ch.{{ $nextChapter->urutan }} →
-            </a>
+        @if ($nextChapter)
+            <a href="{{ route('chapter.show', $nextChapter->id) }}" class="btn-primary">Ch.{{ $nextChapter->urutan }}
+                →</a>
         @else
-            <button class="btn-ghost" disabled style="opacity:.4">Next →</button>
+            <button class="btn-primary" disabled style="opacity:.4">Tamat 🎉</button>
         @endif
     </div>
 
+    {{-- padding bawah agar konten tidak tertutup nav --}}
+    <div style="height:72px"></div>
+
+    {{-- ✅ Modal Report --}}
+    @include('components.modal-report', ['novelId' => $chapter->novel->id])
+
 @endsection
 
-@section('extra-js')
+@push('scripts')
     <script>
-        // Reading progress tracker
-        let readerWidth = 700;
-
-        function updateProgress() {
-            const el = document.getElementById('reader-content');
-            if (!el) return;
-            const rect = el.getBoundingClientRect();
-            const scrolled = window.scrollY;
-            const total = el.offsetHeight + rect.top + scrolled - window.innerHeight;
-            const pct = Math.min(100, Math.max(0, Math.round((scrolled / (total || 1)) * 100)));
-            document.getElementById('read-pct').textContent = pct + '%';
-            document.getElementById('progress-fill').style.width = pct + '%';
-            // Auto save ke server tiap 10%
-            if (pct % 10 === 0 && pct > 0) saveProgress(pct);
-        }
-        window.addEventListener('scroll', updateProgress, {
+        /* scroll progress */
+        window.addEventListener('scroll', function() {
+            var total = document.documentElement.scrollHeight - window.innerHeight;
+            var pct = total > 0 ? Math.min(100, Math.round((window.scrollY / total) * 100)) : 0;
+            var pctEl = document.getElementById('read-pct');
+            var fill = document.getElementById('progress-fill');
+            if (pctEl) pctEl.textContent = pct + '%';
+            if (fill) fill.style.width = pct + '%';
+        }, {
             passive: true
         });
-        updateProgress();
 
-        function saveProgress(pct) {
-            // AJAX save reading history - fire and forget
-            fetch('/api/reading-progress', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                },
-                body: JSON.stringify({
-                    chapter_id: {{ $chapter->id ?? 1 }},
-                    progress: pct
-                })
-            }).catch(() => {});
+        /* font size */
+        var _fontSize = 18;
+
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
         }
 
-        function changeWidth(d) {
-            readerWidth = Math.min(900, Math.max(500, readerWidth + d));
-            document.querySelector('.reader-wrap').style.maxWidth = readerWidth + 'px';
-            document.getElementById('width-display').textContent = readerWidth + 'px';
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('settings-panel');
+            const settingsBtn = document.querySelector('.icon-btn[onclick="toggleSettings()"]');
+            if (panel && settingsBtn && !panel.contains(e.target) && !settingsBtn.contains(e.target)) {
+                panel.style.display = 'none';
+            }
+        });
+
+        /* ✅ Modal helpers */
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
         }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+        document.querySelectorAll('.modal-overlay').forEach(el => {
+            el.addEventListener('click', e => {
+                if (e.target === el) el.classList.remove('open');
+            });
+        });
     </script>
-@endsection
+@endpush

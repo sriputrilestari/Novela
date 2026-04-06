@@ -1,9 +1,7 @@
 /* ============================================================
-   NOVELA – BASE STYLES
-   Reset, body, scrollbar, font, animasi dasar, utilitas.
+   NOVELA – BASE STYLES (UPDATED)
    ============================================================ */
 
-/* ── RESET ── */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
@@ -12,17 +10,18 @@
 
 html {
   scroll-behavior: smooth;
+  height: 100%;
 }
 
 body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-void);
   color: var(--text-white);
-  min-height: 100vh;
+  min-height: 100%;
   overflow-x: hidden;
 }
 
-/* Subtle star-field background */
+/* Star-field background */
 body::before {
   content: '';
   position: fixed;
@@ -30,8 +29,7 @@ body::before {
   z-index: 0;
   background:
     radial-gradient(ellipse at 20% 10%, rgba(79, 124, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(123, 90, 240, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(4, 7, 26, 0.95) 0%, transparent 100%);
+    radial-gradient(ellipse at 80% 80%, rgba(123, 90, 240, 0.08) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -41,13 +39,23 @@ body::before {
 ::-webkit-scrollbar-thumb  { background: var(--border-light); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ── LAYOUT SHELL ── */
+/* ── LAYOUT SHELL — footer selalu di bawah ── */
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   position: relative;
   z-index: 1;
+}
+
+/* Main content area mengisi ruang kosong */
+.app > *:not(.topbar):not(.footer) {
+  flex: 1 0 auto;
+}
+
+/* Pastikan footer tidak flex-grow */
+.app > .footer {
+  flex-shrink: 0;
 }
 
 /* ── PAGES ── */
@@ -59,7 +67,6 @@ body::before {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── ANIMATIONS ── */
 @keyframes slideUp {
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
@@ -75,6 +82,7 @@ body::before {
   padding: 32px 40px;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
 /* ── DIVIDER ── */
@@ -91,7 +99,7 @@ body::before {
   color: var(--text-muted);
 }
 .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-.empty-state p     { font-size: 0.875rem; }
+.empty-state p     { font-size: 0.9rem; color: var(--text-soft); }
 
 /* ── SKELETON LOADER ── */
 .skeleton {
@@ -116,6 +124,8 @@ body::before {
 .mt-24 { margin-top: 24px; }
 .mt-32 { margin-top: 32px; }
 .mb-8  { margin-bottom: 8px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-12 { margin-bottom: 12px; }
 .mb-16 { margin-bottom: 16px; }
 .mb-24 { margin-bottom: 24px; }
 .mb-32 { margin-bottom: 32px; }
@@ -125,23 +135,34 @@ body::before {
 .text-accent { color: var(--accent); }
 .text-green  { color: var(--green); }
 .text-red    { color: var(--red); }
-.text-sm     { font-size: 0.825rem; }
+.text-sm     { font-size: 0.85rem; }
 .text-xs     { font-size: 0.75rem; }
 .font-bold   { font-weight: 700; }
 .font-600    { font-weight: 600; }
 
-/* ── FOOTER ── */
+/* ── GLOBAL LINK — hapus underline ── */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── FOOTER — selalu di bawah ── */
 .footer {
   background: var(--bg-deep);
   border-top: 1px solid var(--border);
-  padding: 24px 40px;
+  padding: 28px 40px;
   text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
+  margin-top: auto;
+  flex-shrink: 0;
 }
+.footer strong { color: var(--text-soft); }
 .footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { color: var(--text-white); }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .content-wrap { padding: 20px 16px; }
+  .footer { padding: 20px 16px; }
 }

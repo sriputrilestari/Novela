@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 class Novel extends Model
 {
     protected $fillable = [
-        'author_id',       // wajib, bukan user_id lagi
+        'author_id', // wajib, bukan user_id lagi
         'genre_id',
         'judul',
         'sinopsis',
@@ -42,4 +41,10 @@ class Novel extends Model
     {
         return $this->hasMany(Report::class);
     }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
 }

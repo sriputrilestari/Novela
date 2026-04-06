@@ -14,6 +14,7 @@ class ReadingHistoryController extends Controller
             ->latest('last_read_at')
             ->get();
 
-        return view('history.index', compact('histories'));
+        return view('pages.history', compact('histories'));
     }
+    
 }

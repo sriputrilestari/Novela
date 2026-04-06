@@ -1,117 +1,83 @@
-{{-- resources/views/pages/search.blade.php --}}
-@extends('layouts.main')
-@section('title', 'Jelajahi – Novela')
+@extends('layouts.app')
+@section('title', 'Novela – Jelajahi')
 
 @section('content')
 
+    {{-- ═══ SEARCH HERO — centered ═══ --}}
     <div class="search-hero">
-        <div style="color:rgba(255,255,255,.7);font-size:.85rem;margin-bottom:8px">
-            Temukan cerita favoritmu
-        </div>
+        <div class="search-hero-label">🔍 Jelajahi Novel</div>
+        <div class="search-hero-sub">Temukan cerita favoritmu dari ribuan judul menarik</div>
 
-        <div class="search-big-wrap">
-            <span class="search-big-icon">🔍</span>
-            <form action="{{ route('search') }}" method="GET" style="flex:1">
-                <input class="search-big" name="q" placeholder="Cari judul, penulis, atau genre..."
-                    value="{{ request('q') }}" autofocus />
-            </form>
-        </div>
-
-        {{-- FILTER GENRE --}}
-        <div class="filter-row" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px">
-
-            {{-- SEMUA --}}
-            <a href="{{ route('search') }}" class="filter-chip {{ !request('genre') ? 'active' : '' }}">
-                📚 Semua
-            </a>
-
-            {{-- GENRE DARI DATABASE --}}
-            @foreach ($genres as $g)
-                <a href="{{ route('search') }}?genre={{ $g->nama_genre }}"
-                    class="filter-chip {{ request('genre') == $g->nama_genre ? 'active' : '' }}">
-
-                    <span class="dot"></span>
-                    {{ $g->nama_genre }}
-                </a>
-            @endforeach
-
-        </div>
-    </div>
+        <form action="{{ route('search') }}" method="GET">
+            <div class="search-big-wrap">
+                <span class="search-big-icon">🔍</span>
+                <input class="search-big" name="q" id="search-big-input" placeholder="Cari judul, penulis, atau genre..."
+                    value="{{ request('q') }}" />
+            </div>
+            <div class="filter-row">
+                <button type="submit" name="genre" value=""
+                    class="filter-chip {{ !request('genre') ? 'active' : '' }}">📚 Semua</button>
+                @foreach ($genres as $genre)
+                    <button type="submit" name="genre" value="{{ $genre->nama_genre }}"
+                        class="filter-chip {{ request('genre') === $genre->nama_genre ? 'active' : '' }}">
+                        {{ $genre->nama_genre }}
+                    </button>
+                @endforeach
+            </div>
+        </form>
     </div>
 
     <div class="content-wrap">
-
-        {{-- TITLE --}}
         <div class="section-header mb-16">
             <div class="section-title">
                 @if (request('q'))
-                    Hasil pencarian: "{{ request('q') }}"
+                    Hasil: "{{ request('q') }}"
                 @elseif(request('genre'))
                     Genre: {{ request('genre') }}
-                @elseif(isset($genreName))
-                    Genre: {{ $genreName }}
                 @else
                     Semua Novel
                 @endif
             </div>
-
-            <span class="text-muted text-sm">
-                {{ $novels->total() ?? 0 }} hasil
-            </span>
+            <span class="text-muted text-sm">{{ $novels->total() }} novel ditemukan</span>
         </div>
 
-        {{-- GRID NOVEL --}}
-        <div class="novel-grid">
-            @forelse($novels as $novel)
-                <a href="{{ route('novel.show', $novel->id) }}" class="novel-card no-underline">
-                    {{-- COVER --}}
-                    <div class="novel-cover">
-                        @if ($novel->cover)
-                            <img src="{{ asset('storage/' . $novel->cover) }}" alt="cover">
-                        @else
-                            <div class="cover-placeholder">📚</div>
-                        @endif
-                    </div>
-
-                    {{-- INFO --}}
-                    <div class="novel-info">
-
-                        <div class="novel-meta-top">
-                            <span class="genre-pill">
-                                {{ $novel->genre->nama_genre ?? '-' }}
-                            </span>
+        @if ($novels->isEmpty())
+            <div class="empty-state">
+                <div class="icon">🔍</div>
+                <p>Novel tidak ditemukan. Coba kata kunci lain.</p>
+            </div>
+        @else
+            <div class="novel-grid mb-32">
+                @foreach ($novels as $novel)
+                    <a href="{{ route('novel.show', $novel->id) }}" class="novel-card">
+                        <div class="novel-cover" style="background:linear-gradient(135deg,var(--bg-mid),var(--bg-card))">
+                            @if ($novel->cover)
+                                <img src="{{ asset('storage/' . $novel->cover) }}" alt="{{ $novel->judul }}" />
+                            @else
+                                📖
+                            @endif
+                            <div class="novel-cover-overlay"></div>
                         </div>
-
-                        <div class="novel-title">
-                            {{ $novel->judul }}
+                        <div class="novel-info">
+                            <div class="novel-title">{{ $novel->judul }}</div>
+                            <div class="novel-author">{{ $novel->author->name }}</div>
+                            <span class="novel-genre">{{ $novel->genre->nama_genre }}</span>
+                            <div class="novel-stars">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <span class="{{ $i <= round($novel->rating) ? 'star-filled' : 'star-empty' }}">★</span>
+                                @endfor
+                                <span>{{ number_format($novel->rating, 1) }}</span>
+                            </div>
                         </div>
+                    </a>
+                @endforeach
+            </div>
 
-                        <div class="novel-author">
-                            {{ $novel->author->name ?? 'Unknown Author' }}
-                        </div>
-
-                        <div class="novel-rating">
-                            <span class="star">★</span>
-                            <span>{{ number_format($novel->rating, 1) }}</span>
-                        </div>
-
-                    </div>
-                </a>
-
-            @empty
-                <div class="empty-state">
-                    📭 Tidak ada novel ditemukan
-                </div>
-            @endforelse
-        </div>
-
-        {{-- PAGINATION --}}
-        @if ($novels->hasPages())
-            <div style="display:flex;justify-content:center;margin-top:32px">
-                {{ $novels->links() }}
+            {{-- Pagination --}}
+            <div style="display:flex;justify-content:center;gap:8px;margin-bottom:32px">
+                {{ $novels->appends(request()->query())->links() }}
             </div>
         @endif
-
     </div>
 
 @endsection

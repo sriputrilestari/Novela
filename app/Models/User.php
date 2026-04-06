@@ -1,18 +1,17 @@
 <?php
-
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\ReadingHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Models\ReadingHistory;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens; 
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -24,8 +23,12 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'is_active', 'is_blocked',
-      ];
+        'bio',
+        'photo',
+        'is_active',
+        'is_blocked',
+        'author_request',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -46,11 +49,11 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 
-        // user punya banyak komentar
+    // user punya banyak komentar
     public function comments()
     {
         return $this->hasMany(Comment::class);

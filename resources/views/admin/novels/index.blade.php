@@ -163,9 +163,9 @@
                                                 <div class="font-weight-bold text-gray-800">
                                                     {{ $novel->judul ?? $novel->title }}</div>
                                                 <div class="small text-muted">
-                                                    <i
+                                                    {{-- <i
                                                         class="fas fa-eye fa-fw mr-1"></i>{{ number_format($novel->views ?? 0) }}
-                                                    views
+                                                    views --}}
                                                 </div>
                                             </div>
                                         </div>
@@ -203,7 +203,7 @@
                                             class="btn btn-sm btn-info" title="Detail Novel"
                                             style="width:32px; height:32px; padding:0; line-height:32px;">
                                             <i class="fas fa-eye"></i>
-                                        </a>    
+                                        </a>
                                         <form action="{{ route('admin.novels.destroy', $novel->id) }}" method="POST"
                                             class="d-inline"
                                             onsubmit="confirmAction('Hapus novel ini secara permanen? Tindakan ini tidak dapat dibatalkan.', () => this.submit()); return false;">

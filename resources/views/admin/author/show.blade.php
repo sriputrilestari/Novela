@@ -131,7 +131,7 @@
                     </div>
                     <div class="card-body">
                         {{-- Toggle Aktif --}}
-                        <form action="{{ route('admin.authors.toggle', $author->id) }}" method="POST" class="mb-2"
+                        <form action="{{ route('admin.author.toggle', $author->id) }}" method="POST" class="mb-2"
                             onsubmit="return confirm('{{ $author->is_active ? 'Nonaktifkan' : 'Aktifkan' }} akun author ini?')">
                             @csrf
                             <button type="submit" class="btn btn-block btn-sm {{ $author->is_active ? 'btn-warning' : 'btn-success' }}">
@@ -142,7 +142,7 @@
 
                         {{-- Blokir --}}
                         @if (!$author->is_blocked)
-                            <form action="{{ route('admin.authors.block', $author->id) }}" method="POST" class="mb-2"
+                            <form action="{{ route('admin.author.block', $author->id) }}" method="POST" class="mb-2"
                                 onsubmit="return confirm('Author akan diblokir dan tidak bisa login. Yakin?')">
                                 @csrf
                                 <button type="submit" class="btn btn-block btn-sm btn-danger">

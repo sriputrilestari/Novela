@@ -9,28 +9,30 @@ use App\Http\Controllers\Admin\AdminController;
 // Auth
 use App\Http\Controllers\Admin\AuthorController as AdminAuthorController;
 
-// Public / Reader
+// admin
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
 use App\Http\Controllers\Admin\NovelController as AdminNovelController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ReaderController as AdminReaderController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Author\ChapterController as AuthorChapterController;
 
-// Admin
+// author
+use App\Http\Controllers\Author\ChapterController as AuthorChapterController;
 use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
 use App\Http\Controllers\Author\NovelController as AuthorNovelController;
 use App\Http\Controllers\Author\ProfileController as AuthorProfileController;
+use App\Http\Controllers\Author\ReportController as AuthorReportController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
 
-// Author
+// reader
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NovelController;
 use App\Http\Controllers\Reader\AuthorRequestController;
-use App\Http\Controllers\Reader\ProfileController as ReaderProfileController;
+use App\Http\Controllers\Reader\ProfileController as ReaderProfileController; // ✅ BARU
+use App\Http\Controllers\Reader\ReportController as ReaderReportController;
 use App\Http\Controllers\ReadingHistoryController;
-use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
 
 // =============================================================================
@@ -45,21 +47,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 // =============================================================================
 // PUBLIC (READER VIEW)
 // =============================================================================
-Route::get('/', [NovelController::class, 'index'])->name('home');
-
-// 🔍 Search
+Route::get('/', [NovelController::class, 'home'])->name('home');
 Route::get('/jelajahi', [NovelController::class, 'search'])->name('search');
-
-// 🏷️ Genre
 Route::get('/genre', [NovelController::class, 'genres'])->name('genres');
 Route::get('/genre/{genre_id}', [NovelController::class, 'byGenre'])->name('genre.show');
-
-// 📖 Novel & Chapter
 Route::get('/novel/{id}', [NovelController::class, 'show'])->name('novel.show');
 Route::get('/novel/{id}/baca', [NovelController::class, 'reader'])->name('reader.read');
-Route::get('/chapter/{id}', [ChapterController::class, 'show'])->name('chapter.show');
-
 Route::post('/novel/{id}/rate', [NovelController::class, 'rate'])->name('novel.rate');
+Route::get('/chapter/{id}', [ChapterController::class, 'show'])->name('chapter.show');
 
 // redirect home
 Route::get('/home', fn() => redirect('/'));
@@ -79,10 +74,8 @@ Route::middleware('auth')->group(function () {
     // 📚 History
     Route::get('/history', [ReadingHistoryController::class, 'index'])->name('history');
 
-    // 👤 Profile
-    Route::get('/profil', [ReaderProfileController::class, 'index'])->name('profile');
-    Route::post('/profil/update', [ReaderProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profil/password', [ReaderProfileController::class, 'updatePassword'])->name('profile.password');
+    // 🚩 Report Novel (semua role yang login bisa lapor)
+    Route::post('/novel/{id}/report', [ReaderReportController::class, 'store'])->name('novel.report');
 });
 
 // =============================================================================
@@ -96,11 +89,11 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         // Authors
-        Route::get('/authors', [AdminAuthorController::class, 'index'])->name('authors.index');
-        Route::get('/authors/{id}', [AdminAuthorController::class, 'show'])->name('authors.show');
-        Route::post('/authors/{id}/toggle', [AdminAuthorController::class, 'toggle'])->name('authors.toggle');
-        Route::post('/authors/{id}/block', [AdminAuthorController::class, 'block'])->name('authors.block');
-        Route::delete('/authors/{id}', [AdminAuthorController::class, 'destroy'])->name('authors.destroy');
+        Route::get('/author', [AdminAuthorController::class, 'index'])->name('author.index');
+        Route::get('/author/{id}', [AdminAuthorController::class, 'show'])->name('author.show');
+        Route::post('/author/{id}/toggle', [AdminAuthorController::class, 'toggle'])->name('author.toggle');
+        Route::post('/author/{id}/block', [AdminAuthorController::class, 'block'])->name('author.block');
+        Route::delete('/author/{id}', [AdminAuthorController::class, 'destroy'])->name('author.destroy');
 
         // Readers
         Route::get('/readers', [AdminReaderController::class, 'index'])->name('reader.index');
@@ -126,8 +119,18 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/genres/{id}', [AdminGenreController::class, 'update'])->name('genre.update');
         Route::delete('/genres/{id}', [AdminGenreController::class, 'destroy'])->name('genre.destroy');
 
-        // Reports
+        // ✅ Reports — lengkap
         Route::get('reports', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
+        Route::post('reports/{report}/review', [AdminReportController::class, 'review'])->name('reports.review');
+        Route::post('reports/{report}/warn', [AdminReportController::class, 'warn'])->name('reports.warn');
+        Route::post('reports/{report}/reject', [AdminReportController::class, 'reject'])->name('reports.reject');
+        Route::delete('reports/{report}/novel', [AdminReportController::class, 'deleteNovel'])->name('reports.deleteNovel');
+
+        // Profile
+        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+        Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+        Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     });
 
 // =============================================================================
@@ -140,25 +143,46 @@ Route::middleware(['auth', 'role:author'])
 
         Route::get('/dashboard', [AuthorDashboardController::class, 'index'])->name('dashboard');
 
-        // Novel
+        // NOVEL
         Route::get('/novels', [AuthorNovelController::class, 'index'])->name('novel.index');
         Route::get('/novels/create', [AuthorNovelController::class, 'create'])->name('novel.create');
         Route::post('/novels', [AuthorNovelController::class, 'store'])->name('novel.store');
-        Route::get('/novels/{id}/edit', [AuthorNovelController::class, 'edit'])->name('novel.edit');
-        Route::put('/novels/{id}', [AuthorNovelController::class, 'update'])->name('novel.update');
-        Route::delete('/novel/{novel}', [AuthorNovelController::class, 'destroy'])->name('novel.destroy');
+        Route::get('/novels/{novel}/edit', [AuthorNovelController::class, 'edit'])->name('novel.edit');
+        Route::put('/novels/{novel}', [AuthorNovelController::class, 'update'])->name('novel.update');
+        Route::delete('/novels/{novel}', [AuthorNovelController::class, 'destroy'])->name('novel.destroy');
 
-        // Chapter
-        Route::get('/novels/{novel}/chapters', [AuthorChapterController::class, 'index'])->name('chapter.index');
-        Route::get('/novels/{novel}/chapters/create', [AuthorChapterController::class, 'create'])->name('chapter.create');
-        Route::post('/novels/{novel}/chapters', [AuthorChapterController::class, 'store'])->name('chapter.store');
+        // CHAPTER
+        Route::prefix('/novels/{novel}/chapters')->group(function () {
+            Route::get('/', [AuthorChapterController::class, 'index'])->name('chapter.index');
+            Route::get('/create', [AuthorChapterController::class, 'create'])->name('chapter.create');
+            Route::post('/', [AuthorChapterController::class, 'store'])->name('chapter.store');
 
-        // Profile
+            Route::get('/{chapter}', [AuthorChapterController::class, 'show'])->name('chapter.show');
+            Route::get('/{chapter}/edit', [AuthorChapterController::class, 'edit'])->name('chapter.edit');
+            Route::put('/{chapter}', [AuthorChapterController::class, 'update'])->name('chapter.update');
+            Route::delete('/{chapter}', [AuthorChapterController::class, 'destroy'])->name('chapter.destroy');
+            Route::post('/{chapter}/toggle', [AuthorChapterController::class, 'toggle'])->name('chapter.toggle');
+        });
+
+        // PROFILE
         Route::get('profile', [AuthorProfileController::class, 'index'])->name('profile.index');
+        Route::post('profile/update', [AuthorProfileController::class, 'update'])->name('profile.update');
+        Route::post('profile/password', [AuthorProfileController::class, 'updatePassword'])->name('profile.password');
+
+        // COMMENT
+        Route::get('/comments', [\App\Http\Controllers\Author\CommentController::class, 'index'])->name('comment.index');
+        Route::get('/comments/{id}', [\App\Http\Controllers\Author\CommentController::class, 'show'])->name('comment.show');
+        Route::post('/comments/{id}/reply', [\App\Http\Controllers\Author\CommentController::class, 'reply'])->name('comment.reply');
+        Route::patch('/comments/{id}/toxic', [\App\Http\Controllers\Author\CommentController::class, 'markToxic'])->name('comment.toxic');
+        Route::delete('/comments/{id}', [\App\Http\Controllers\Author\CommentController::class, 'destroy'])->name('comment.destroy');
+
+        // ✅ REPORTS — tambah show
+        Route::get('/reports', [AuthorReportController::class, 'index'])->name('report.index');
+        Route::get('/reports/{id}', [AuthorReportController::class, 'show'])->name('report.show');
     });
 
 // =============================================================================
-// READER (KHUSUS ROLE)
+// READER
 // =============================================================================
 Route::middleware(['auth', 'role:reader'])
     ->prefix('reader')
@@ -174,4 +198,5 @@ Route::middleware(['auth', 'role:reader'])
         // 👤 Profile
         Route::get('profile', [ReaderProfileController::class, 'index'])->name('profile.index');
         Route::post('profile/update', [ReaderProfileController::class, 'update'])->name('profile.update');
+        Route::post('profile/password', [ReaderProfileController::class, 'updatePassword'])->name('profile.password');
     });

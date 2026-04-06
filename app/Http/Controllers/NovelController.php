@@ -6,6 +6,7 @@ use App\Models\Chapter;
 use App\Models\Comment;
 use App\Models\Genre;
 use App\Models\Novel;
+use App\Models\Rating;
 use App\Models\ReadingHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,44 +14,62 @@ use Illuminate\Support\Facades\Auth;
 class NovelController extends Controller
 {
     // GET / (Home)
-    public function index()
+    public function home()
     {
-        $latestNovels = Novel::with(['author', 'genre'])
-            ->where('approval_status', 'published')
-            ->latest()
-            ->take(12)
+        $featured = Novel::where('approval_status', 'published')
+            ->orderByDesc('rating')
+            ->with(['author', 'genre'])
+            ->withCount('chapters')
+            ->first();
+
+        // Novel Terbaru — urut dari yang terbaru dibuat (tampil kiri = grid auto-fill)
+        $latestNovels = Novel::where('approval_status', 'published')
+            ->orderByDesc('created_at')
+            ->with(['author', 'genre'])
+            ->limit(12)
             ->get();
 
-        $popularNovels = Novel::with(['author', 'genre'])
-            ->where('approval_status', 'published')
-            ->orderBy('views', 'desc')
-            ->take(5)
+        // Novel Populer — diambil dari views terbanyak
+        $popularNovels = Novel::where('approval_status', 'published')
+            ->orderByDesc('views')
+            ->with(['author', 'genre'])
+            ->withCount('chapters')
+            ->limit(10)
             ->get();
 
+        // Stats user (jika login)
         $stats          = [];
         $readingHistory = collect();
 
-        if (Auth::check()) {
-            $userId = Auth::id();
-
-            $readingHistory = ReadingHistory::with(['chapter.novel.author'])
-                ->where('user_id', $userId)
-                ->latest('last_read_at')
-                ->take(4)
-                ->get();
+        if (auth()->check()) {
+            $user = auth()->user();
 
             $stats = [
-                'novels_read'   => ReadingHistory::where('user_id', $userId)
-                    ->join('chapters', 'reading_history.chapter_id', '=', 'chapters.id')
-                    ->distinct('chapters.novel_id')
-                    ->count('chapters.novel_id'),
-                'favorites'     => Bookmark::where('user_id', $userId)->count(),
-                'chapters_done' => ReadingHistory::where('user_id', $userId)->count(),
-                'comments'      => Comment::where('user_id', $userId)->count(),
+                'novels_read'   => ReadingHistory::where('user_id', $user->id)
+                    ->with('chapter')
+                    ->get()
+                    ->pluck('chapter.novel_id')
+                    ->unique()
+                    ->count(),
+                'favorites'     => Bookmark::where('user_id', $user->id)->count(),
+                'chapters_done' => ReadingHistory::where('user_id', $user->id)->count(),
+                'comments'      => Comment::where('user_id', $user->id)->count(),
             ];
+
+            $readingHistory = ReadingHistory::where('user_id', $user->id)
+                ->with(['chapter.novel.author', 'chapter.novel.genre'])
+                ->orderByDesc('last_read_at')
+                ->limit(4)
+                ->get();
         }
 
-        return view('pages.home', compact('latestNovels', 'popularNovels', 'stats', 'readingHistory'));
+        return view('pages.home', compact(
+            'featured',
+            'latestNovels',
+            'popularNovels',
+            'stats',
+            'readingHistory'
+        ));
     }
 
     // GET /novel/{id}  ← INI YANG PALING BANYAK MASALAHNYA
@@ -196,20 +215,32 @@ class NovelController extends Controller
     // POST /novel/{id}/rate
     public function rate(Request $request, $id)
     {
-        $novel = Novel::findOrFail($id);
-
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
         ]);
 
-        $rating = (int) $request->rating;
+        // simpan / update rating user
+        Rating::updateOrCreate(
+            [
+                'user_id'  => Auth::id(),
+                'novel_id' => $id,
+            ],
+            [
+                'rating' => $request->rating,
+            ]
+        );
 
-        $total                = $novel->rating * $novel->total_rating;
-        $novel->total_rating += 1;
-        $novel->rating        = ($total + $rating) / $novel->total_rating;
+        // hitung ulang rata-rata
+        $avg   = Rating::where('novel_id', $id)->avg('rating');
+        $count = Rating::where('novel_id', $id)->count();
 
-        $novel->save();
+        $novel = Novel::findOrFail($id);
 
-        return back()->with('success', 'Terima kasih atas ratingnya!');
+        $novel->update([
+            'rating'       => round($avg, 2),
+            'total_rating' => $count,
+        ]);
+
+        return back()->with('success', 'Rating berhasil dikirim!');
     }
 }

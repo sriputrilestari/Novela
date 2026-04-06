@@ -1,9 +1,8 @@
 <?php
-
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class AuthorSeeder extends Seeder
@@ -12,10 +11,10 @@ class AuthorSeeder extends Seeder
     {
         User::insert([
             [
-                'name' => 'CobaAuthor',
-                'email' => 'cobaauthor@gmail.com',
+                'name'     => 'Author',
+                'email'    => 'author@example.com',
                 'password' => Hash::make('password'),
-                'role' => 'author',
+                'role'     => 'author',
             ],
         ]);
     }

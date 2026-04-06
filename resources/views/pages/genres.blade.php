@@ -1,26 +1,64 @@
-@extends('layouts.main')
-@section('title', 'Genre – Novela')
+@extends('layouts.app')
+@section('title', 'Novela – Genre')
+
 @section('content')
+
+    {{-- ═══ GENRE HERO ═══ --}}
+    <div class="genres-hero">
+        <div class="genres-hero-title">📚 Semua Genre</div>
+        <div class="genres-hero-sub">Temukan novel sesuai genre favoritmu</div>
+    </div>
+
     <div class="content-wrap">
-        <div class="section-title mb-8" style="font-size:1.3rem">📚 Semua Genre</div>
-        <p class="text-muted text-sm mb-24">Temukan novel sesuai genre favoritmu</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px">
-            @foreach ($genres as $genre)
-                <a href="{{ route('search') }}?genre={{ urlencode($genre->nama_genre) }}" class="novel-card"
-                    style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);text-decoration:none;overflow:hidden;display:flex;flex-direction:column">
 
-                    <div
-                        style="background:linear-gradient(135deg,#1e2f9e,#3d5af1);padding:24px;text-align:center;font-size:2rem">
-                        📚
-                    </div>
+        @php
+            $genres = \App\Models\Genre::withCount([
+                'novels' => fn($q) => $q->where('approval_status', 'published'),
+            ])->get();
 
-                    <div style="padding:14px;text-align:center">
-                        <div style="font-weight:700;color:var(--ink)">
-                            {{ $genre->nama_genre }}
+            // Emoji per genre
+            $genreEmoji = [
+                'Fantasy' => '🧙',
+                'Romance' => '💕',
+                'Action' => '⚔️',
+                'Horror' => '👻',
+                'Mystery' => '🔍',
+                'Sci-Fi' => '🚀',
+                'Isekai' => '🌀',
+                'School Life' => '🏫',
+                'Slice of Life' => '☀️',
+                'Xianxia' => '🐉',
+                'Historical' => '📜',
+                'System' => '💻',
+                'Thriller' => '😱',
+                'Comedy' => '😄',
+                'Drama' => '🎭',
+                'Adventure' => '🗺️',
+            ];
+        @endphp
+
+        @if ($genres->isEmpty())
+            <div class="empty-state">
+                <div class="icon">📂</div>
+                <p>Belum ada genre.</p>
+            </div>
+        @else
+            <div class="genre-cards-grid">
+                @foreach ($genres as $genre)
+                    <a href="{{ route('genre.show', $genre->id) }}" class="genre-card-item">
+                        <div class="genre-card-top">
+                            <span style="position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))">
+                                {{ $genreEmoji[$genre->nama_genre] ?? '📖' }}
+                            </span>
                         </div>
-                    </div>
-                </a>
-            @endforeach
-        </div>
+                        <div class="genre-card-bottom">
+                            <div class="genre-card-name">{{ $genre->nama_genre }}</div>
+                            <div class="genre-card-count">{{ $genre->novels_count }} novel</div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
     </div>
 @endsection

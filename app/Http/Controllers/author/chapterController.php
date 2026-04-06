@@ -9,15 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ChapterController extends Controller
 {
+    // =====================
     // LIST CHAPTER PER NOVEL
-    public function index($novel_id)
+    // =====================
+    public function index(Novel $novel)
     {
-        $novel = Novel::where('id', $novel_id)
-            ->where('author_id', Auth::id())
-            ->firstOrFail();
+        $this->checkOwner($novel);
 
-        $chapters = $novel->chapters()->orderBy('urutan')->get();
-
+        $chapters  = $novel->chapters()->orderBy('urutan')->get();
         $total     = $chapters->count();
         $published = $chapters->where('status', 'published')->count();
         $draft     = $chapters->where('status', 'draft')->count();
@@ -27,30 +26,22 @@ class ChapterController extends Controller
         ));
     }
 
+    // =====================
     // FORM CREATE
-    public function create($novel_id)
+    // =====================
+    public function create(Novel $novel)
     {
-        $novel = Novel::where('id', $novel_id)
-            ->where('author_id', Auth::id())
-            ->firstOrFail();
-
+        $this->checkOwner($novel);
         return view('author.chapter.create', compact('novel'));
     }
 
-    // STORE
-    public function store(Request $request, $novel_id)
+    // =====================
+    // STORE CHAPTER
+    // =====================
+    public function store(Request $request, Novel $novel)
     {
-        $novel = Novel::where('id', $novel_id)
-            ->where('author_id', Auth::id())
-            ->firstOrFail();
+        $this->checkOwner($novel);
 
-        $request->validate([
-            'urutan'  => 'required|integer|min:1',
-            'title'   => 'required|string|max:255',
-            'content' => 'required',
-        ]);
-
-        // tambah validasi status dulu
         $request->validate([
             'urutan'  => 'required|integer|min:1',
             'title'   => 'required|string|max:255',
@@ -58,17 +49,10 @@ class ChapterController extends Controller
             'status'  => 'required|in:draft,published',
         ]);
 
-        // auto-format paragraf
-        $content = collect(explode("\n", $request->content))
-            ->map(fn($l) => trim($l))
-            ->filter()
-            ->map(fn($l) => '<p>' . $l . '</p>')
-            ->implode("\n");
-
         $novel->chapters()->create([
             'urutan'        => $request->urutan,
             'judul_chapter' => $request->title,
-            'isi'           => $content,
+            'isi'           => $request->content, // simpan mentah
             'status'        => $request->status,
         ]);
 
@@ -76,96 +60,96 @@ class ChapterController extends Controller
             ->with('success', 'Chapter berhasil ditambahkan.');
     }
 
+    // =====================
     // FORM EDIT
+    // =====================
     public function edit(Novel $novel, Chapter $chapter)
     {
-        if ($novel->author_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->checkOwner($novel);
+        $this->checkChapter($novel, $chapter);
 
         return view('author.chapter.edit', compact('novel', 'chapter'));
     }
 
-    // UPDATE
-    public function update(Request $request, $novel_id, $id)
-    {
-        $novel = Novel::where('id', $novel_id)
-            ->where('author_id', Auth::id())
-            ->firstOrFail();
+    // =====================
+    // UPDATE CHAPTER
+    // =====================
+    public function update(Request $request, Novel $novel, Chapter $chapter) {
+        $this->checkOwner($novel);
+        $this->checkChapter($novel, $chapter);
 
-        $chapter = Chapter::where('id', $id)
-            ->where('novel_id', $novel->id)
-            ->firstOrFail();
-
-        $request->validate([
-            'urutan'  => 'required|integer|min:1',
-            'title'   => 'required|string|max:255',
-            'content' => 'required',
-        ]);
-        $request->validate([
+        // validasi
+        $validated = $request->validate([
             'urutan'  => 'required|integer|min:1',
             'title'   => 'required|string|max:255',
             'content' => 'required',
             'status'  => 'required|in:draft,published',
         ]);
 
-        $content = collect(explode("\n", $request->content))
-            ->map(fn($l) => trim($l))
-            ->filter()
-            ->map(fn($l) => '<p>' . $l . '</p>')
-            ->implode("\n");
-
+        // update
         $chapter->update([
-            'urutan'        => $request->urutan,
-            'judul_chapter' => $request->title,
-            'isi'           => $content,
-            'status'        => $request->status,
+            'urutan'        => $validated['urutan'],
+            'judul_chapter' => $validated['title'],
+            'isi'           => $validated['content'],
+            'status'        => $validated['status'],
         ]);
 
         return redirect()->route('author.chapter.index', $novel->id)
             ->with('success', 'Chapter berhasil diupdate.');
     }
 
-    // SHOW
-    public function show($novel_id, $id)
+    // =====================
+    // SHOW CHAPTER
+    // =====================
+    public function show(Novel $novel, Chapter $chapter)
     {
-        $novel = Novel::where('id', $novel_id)
-            ->where('author_id', Auth::id())
-            ->firstOrFail();
-
-        $chapter = Chapter::where('id', $id)
-            ->where('novel_id', $novel->id)
-            ->firstOrFail();
+        $this->checkOwner($novel);
+        $this->checkChapter($novel, $chapter);
 
         return view('author.chapter.show', compact('novel', 'chapter'));
     }
 
-    // DELETE
-    public function destroy($novel_id, $id)
+    // =====================
+    // DELETE CHAPTER
+    // =====================
+    public function destroy(Novel $novel, Chapter $chapter)
     {
-        $chapter = Chapter::whereHas('novel', function ($q) {
-            $q->where('author_id', Auth::id());
-        })->findOrFail($id);
+        $this->checkOwner($novel);
+        $this->checkChapter($novel, $chapter);
 
         $chapter->delete();
 
-        return back()->with('success', 'Chapter berhasil dihapus');
+        return back()->with('success', 'Chapter berhasil dihapus.');
     }
 
+    // =====================
     // TOGGLE STATUS
-    public function toggle($novel_id, $id)
+    // =====================
+    public function toggle(Novel $novel, Chapter $chapter)
     {
-        $novel = Novel::where('id', $novel_id)
-            ->where('author_id', Auth::id())
-            ->firstOrFail();
-
-        $chapter = Chapter::where('id', $id)
-            ->where('novel_id', $novel->id)
-            ->firstOrFail();
+        $this->checkOwner($novel);
+        $this->checkChapter($novel, $chapter);
 
         $chapter->status = $chapter->status === 'draft' ? 'published' : 'draft';
         $chapter->save();
 
         return back()->with('success', 'Status berhasil diperbarui.');
+    }
+
+    // =====================
+    // HELPERS
+    // =====================
+    private function checkOwner(Novel $novel)
+    {
+        if ($novel->author_id !== Auth::id()) {
+            abort(403, 'This action is unauthorized.');
+        }
+    }
+
+    private function checkChapter(Novel $novel, Chapter $chapter)
+    {
+        if ($chapter->novel_id !== $novel->id) {
+            abort(403, 'This chapter does not belong to this novel.');
+        }
     }
 }

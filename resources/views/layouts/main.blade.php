@@ -7,10 +7,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>@yield('title', 'Novela – Baca Novel Online')</title>
 
+    <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pages.css') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet" />
 
     <style>
@@ -40,7 +44,22 @@
             --shadow: 0 2px 16px rgba(24, 25, 42, .07);
             --shadow-h: 0 8px 32px rgba(24, 25, 42, .13);
             --font: 'Plus Jakarta Sans', sans-serif;
-            --serif: 'Lora', serif;
+            --serif: 'DM Serif Display', serif;
+            --sans: 'Plus Jakarta Sans', sans-serif;
+
+            /* alias untuk profile page */
+            --blue-dark: #2d49e0;
+            --blue-light: #eef0fe;
+            --ink: #18192a;
+            --ink-2: #5a5f7a;
+            --ink-3: #9698ae;
+            --line: #e8eaf3;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-xs: 0 1px 3px rgba(24, 25, 42, .07);
+            --shadow-sm: 0 2px 8px rgba(24, 25, 42, .10);
+            --shadow-md: 0 4px 20px rgba(24, 25, 42, .13);
         }
 
         /* ═══════════════════════════════════════════
@@ -110,9 +129,8 @@
             padding: 32px 40px;
         }
 
-        /* ═══════════════════════════════════════════
-       NAVBAR
-    ═══════════════════════════════════════════ */
+        /* ================= NAVBAR FINAL ================= */
+
         .navbar {
             background: var(--white);
             border-bottom: 1.5px solid var(--line);
@@ -122,35 +140,36 @@
             box-shadow: 0 1px 12px rgba(24, 25, 42, .06);
         }
 
+        /* WRAPPER */
         .nav-inner {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 40px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            padding: 0 48px;
+            height: 72px;
+
+            position: relative;
+            /* penting */
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
+        /* LOGO */
         .nav-logo {
             font-family: var(--serif);
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             color: var(--blue);
             text-decoration: none;
-            flex-shrink: 0;
             display: flex;
             align-items: center;
-            gap: 7px;
-            margin-right: 3rem;
+            z-index: 2;
         }
 
+        /* SEARCH */
         .nav-search {
-            flex: 1;
-            max-width: 360px;
+            max-width: 280px;
+            width: 100%;
             position: relative;
             display: flex;
             align-items: center;
@@ -165,15 +184,15 @@
 
         .nav-search input {
             width: 100%;
-            padding: 9px 14px 9px 36px;
+            padding: 10px 14px 10px 38px;
             border: 1.5px solid var(--line);
             border-radius: 999px;
-            font-size: .845rem;
+            font-size: 0.9rem;
             font-weight: 500;
             color: var(--ink);
             background: var(--bg);
             outline: none;
-            transition: border .2s, background .2s;
+            transition: 0.2s;
         }
 
         .nav-search input:focus {
@@ -182,30 +201,36 @@
             box-shadow: 0 0 0 3px rgba(61, 90, 241, .1);
         }
 
+        /* MENU */
         .nav-links {
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 2px;
-            flex: 1;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            gap: 18px;
+
         }
 
+        /* LINK */
         .nav-link {
             display: flex;
             align-items: center;
-            gap: 5px;
-            padding: 7px 11px;
-            border-radius: 10px;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 12px;
             text-decoration: none;
-            font-size: .845rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--ink-2);
-            transition: background .15s, color .15s;
+            transition: 0.2s;
             white-space: nowrap;
         }
 
         .nav-link svg {
-            width: 15px;
-            height: 15px;
+            width: 16px;
+            height: 16px;
             flex-shrink: 0;
         }
 
@@ -215,14 +240,16 @@
             color: var(--blue);
         }
 
-        .nav-user-menu {
-            position: relative;
-            flex-shrink: 0;
+        /* RIGHT USER */
+        .nav-user-menu,
+        .nav-auth {
+            z-index: 2;
         }
 
+        /* AVATAR */
         .nav-avatar {
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
             background: linear-gradient(135deg, var(--blue), var(--blue-dk));
             color: white;
@@ -230,11 +257,10 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: .8rem;
+            font-size: 0.9rem;
             cursor: pointer;
             user-select: none;
-            transition: box-shadow .2s, transform .15s;
-            letter-spacing: .5px;
+            transition: 0.2s;
         }
 
         .nav-avatar:hover {
@@ -242,6 +268,7 @@
             transform: translateY(-1px);
         }
 
+        /* DROPDOWN */
         .user-dropdown {
             position: absolute;
             right: 0;
@@ -273,6 +300,7 @@
             }
         }
 
+        /* DROPDOWN HEADER */
         .dropdown-header {
             padding: 14px 16px;
             border-bottom: 1px solid var(--line);
@@ -291,6 +319,7 @@
             margin-top: 2px;
         }
 
+        /* DROPDOWN ITEM */
         .dropdown-item {
             display: flex;
             align-items: center;
@@ -659,103 +688,6 @@
             background: rgba(201, 168, 76, .2);
             color: #f0d080;
             border-color: rgba(201, 168, 76, .3);
-        }
-
-        /* ═══════════════════════════════════════════
-       HERO BANNER
-    ═══════════════════════════════════════════ */
-        .hero-banner {
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, #0b1338 0%, #152060 45%, #1e2f9e 100%);
-            padding: 64px 40px;
-            min-height: 380px;
-            display: flex;
-            align-items: center;
-        }
-
-        .hero-banner::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 75% 50%, rgba(61, 90, 241, .25) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(168, 85, 247, .12) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .hero-bg-img {
-            position: absolute;
-            right: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 10rem;
-            opacity: .07;
-            user-select: none;
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 580px;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, .1);
-            border: 1px solid rgba(255, 255, 255, .2);
-            border-radius: 999px;
-            padding: 4px 14px;
-            font-size: .75rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, .85);
-            margin-bottom: 18px;
-            backdrop-filter: blur(4px);
-        }
-
-        .hero-title {
-            font-family: var(--serif);
-            font-size: 2.8rem;
-            font-weight: 700;
-            line-height: 1.15;
-            margin-bottom: 10px;
-            color: white;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, .3);
-        }
-
-        .hero-author {
-            color: rgba(255, 255, 255, .7);
-            font-size: .875rem;
-            margin-bottom: 10px;
-        }
-
-        .hero-desc {
-            color: rgba(255, 255, 255, .75);
-            font-family: var(--serif);
-            font-size: 1.05rem;
-            line-height: 1.75;
-            margin-bottom: 22px;
-            max-width: 460px;
-        }
-
-        .hero-meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .hero-stars {
-            color: #f5c842;
-            letter-spacing: 1px;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
         }
 
         /* ═══════════════════════════════════════════
@@ -1257,7 +1189,7 @@
             color: var(--blue);
         }
 
-        .fav-tab.active {
+        .fav-tab.active {   
             background: var(--blue);
             color: white;
             border-color: var(--blue);
@@ -1487,50 +1419,51 @@
     ═══════════════════════════════════════════ */
         .profile-header {
             background: linear-gradient(135deg, #0b1338, #1e2f9e);
-            padding: 48px 40px;
-            text-align: center;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
             position: relative;
             overflow: hidden;
         }
+
 
         .profile-header::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse at 50% 80%, rgba(61, 90, 241, .25) 0%, transparent 60%);
+            background: radial-gradient(ellipse at 70% 50%, rgba(61, 90, 241, .3) 0%, transparent 60%);
             pointer-events: none;
         }
 
         .profile-avatar-wrap {
             position: relative;
-            display: inline-block;
-            margin-bottom: 16px;
+            flex-shrink: 0;
+            z-index: 1;
         }
 
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--blue), var(--purple));
             border: 3px solid rgba(255, 255, 255, .25);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: white;
-            margin: 0 auto;
-            box-shadow: 0 0 32px rgba(61, 90, 241, .4);
+            box-shadow: 0 0 24px rgba(61, 90, 241, .4);
             overflow: hidden;
-            position: relative;
         }
 
         .avatar-change-btn {
             position: absolute;
-            bottom: 4px;
-            right: 4px;
-            width: 28px;
-            height: 28px;
+            bottom: 2px;
+            right: 2px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background: var(--blue);
             border: 2px solid white;
@@ -1539,47 +1472,58 @@
             justify-content: center;
             cursor: pointer;
             color: white;
-            font-size: .75rem;
+            font-size: .65rem;
         }
+
+        .profile-info {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
 
         .profile-name {
             font-family: var(--serif);
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: white;
-            margin-bottom: 4px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 3px;
         }
 
+
         .profile-email {
-            font-size: .875rem;
+            font-size: .8rem;
             color: rgba(255, 255, 255, .6);
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 10px;
         }
+
 
         .profile-badges {
             display: flex;
-            justify-content: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
         }
 
         .profile-badge {
             background: rgba(255, 255, 255, .1);
             border: 1px solid rgba(255, 255, 255, .2);
             border-radius: 999px;
-            padding: 4px 14px;
-            font-size: .78rem;
+            padding: 3px 10px;
+            font-size: .72rem;
             color: rgba(255, 255, 255, .85);
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        }
+
+        .badge-gold {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, .15);
+            border-color: rgba(251, 191, 36, .3);
+        }
+
+        .badge-green {
+            color: #34d399;
+            background: rgba(52, 211, 153, .1);
+            border-color: rgba(52, 211, 153, .25);
         }
 
         .profile-stats {
@@ -2353,7 +2297,13 @@
     ═══════════════════════════════════════════ */
         @media (max-width: 900px) {
             .nav-inner {
-                padding: 0 16px;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 48px;
+                height: 72px;
+
+                display: flex;
+                align-items: center;
             }
 
             .stats-strip {
@@ -2544,10 +2494,433 @@
             color: inherit;
         }
 
+        <style>
+        /* ── PROFILE PAGE STYLES ── */
 
+        .pf-wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px 32px 40px;
+        }
 
-        @yield('extra-css')
+        /* HERO BAR */
+        .pf-hero {
+            background: var(--white);
+            border: 1.5px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .pf-av-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .pf-av {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            border: 3px solid var(--blue-lt);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .pf-av-btn {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--blue);
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: .6rem;
+            transition: background .15s;
+        }
+
+        .pf-av-btn:hover {
+            background: var(--blue-dk);
+        }
+
+        .pf-info {
+            flex: 1;
+        }
+
+        .pf-name {
+            font-family: var(--serif);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.2;
+        }
+
+        .pf-email {
+            font-size: .775rem;
+            color: var(--ink-3);
+            margin-top: 2px;
+        }
+
+        .pf-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .pf-badge {
+            font-size: .7rem;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 999px;
+            border: 1px solid;
+        }
+
+        .pf-badge-blue {
+            background: var(--blue-lt);
+            color: var(--blue);
+            border-color: var(--blue-md);
+        }
+
+        .pf-badge-gold {
+            background: var(--amber-lt);
+            color: #c2862f;
+            border-color: rgba(241, 168, 61, .25);
+        }
+
+        .pf-badge-green {
+            background: var(--green-lt);
+            color: #009b80;
+            border-color: rgba(0, 201, 167, .25);
+        }
+
+        /* WRITER BANNER inside hero */
+        .pf-writer-box {
+            background: var(--blue-lt);
+            border: 1.5px solid var(--blue-md);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-shrink: 0;
+            min-width: 200px;
+        }
+
+        .pf-writer-title {
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .pf-writer-sub {
+            font-size: .7rem;
+            color: var(--ink-3);
+            margin-top: 2px;
+        }
+
+        .pf-writer-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 13px;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 700;
+            background: var(--blue);
+            color: white;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .15s;
+            flex-shrink: 0;
+        }
+
+        .pf-writer-btn:hover {
+            background: var(--blue-dk);
+        }
+
+        /* MAIN GRID 2-COL */
+        .pf-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .pf-grid-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* CARD */
+        .pf-card {
+            background: var(--white);
+            border: 1.5px solid var(--line);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .pf-card-head {
+            padding: 11px 18px;
+            border-bottom: 1px solid var(--line);
+            font-size: .845rem;
+            font-weight: 700;
+            color: var(--ink);
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .pf-card-body {
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* FORM ELEMENTS */
+        .pf-row2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .pf-row3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .pf-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .pf-lbl {
+            font-size: .775rem;
+            font-weight: 700;
+            color: var(--ink-2);
+        }
+
+        .pf-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid var(--line);
+            border-radius: 10px;
+            font-size: .845rem;
+            color: var(--ink);
+            background: var(--white);
+            font-family: var(--font);
+            outline: none;
+            transition: border .2s, box-shadow .2s;
+        }
+
+        .pf-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(61, 90, 241, .1);
+        }
+
+        .pf-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid var(--line);
+            border-radius: 10px;
+            font-size: .845rem;
+            color: var(--ink);
+            background: var(--white);
+            font-family: var(--font);
+            outline: none;
+            resize: none;
+            height: 70px;
+            transition: border .2s, box-shadow .2s;
+        }
+
+        .pf-textarea:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(61, 90, 241, .1);
+        }
+
+        .pf-form-error {
+            font-size: .72rem;
+            color: var(--red);
+            margin-top: 2px;
+        }
+
+        .pf-row-end {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .pf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: .8rem;
+            font-weight: 700;
+            background: var(--blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: all .2s;
+        }
+
+        .pf-btn:hover {
+            background: var(--blue-dk);
+            box-shadow: 0 4px 14px rgba(61, 90, 241, .3);
+            transform: translateY(-1px);
+        }
+
+        .pf-btn-danger {
+            background: transparent;
+            color: var(--red);
+            border: 1.5px solid rgba(241, 82, 61, .3);
+            padding: 7px 16px;
+        }
+
+        .pf-btn-danger:hover {
+            background: var(--red-lt);
+            border-color: var(--red);
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* SWITCH TOGGLE */
+        .pf-sw-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .pf-sw-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .pf-sw-row:first-child {
+            padding-top: 0;
+        }
+
+        .pf-sw-lbl {
+            font-size: .845rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .pf-sw-sub {
+            font-size: .72rem;
+            color: var(--ink-3);
+            margin-top: 2px;
+        }
+
+        .pf-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .pf-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .pf-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--line);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .pf-slider::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            top: 3px;
+            left: 3px;
+            transition: transform .2s;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .15);
+        }
+
+        .pf-switch input:checked+.pf-slider {
+            background: var(--blue);
+        }
+
+        .pf-switch input:checked+.pf-slider::after {
+            transform: translateX(18px);
+        }
+
+        /* DANGER CARD */
+        .pf-card-danger {
+            border-color: rgba(241, 82, 61, .25);
+        }
+
+        .pf-card-danger .pf-card-head {
+            color: var(--red);
+            background: var(--red-lt);
+            border-bottom-color: rgba(241, 82, 61, .15);
+        }
+
+        .pf-danger-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .pf-danger-title {
+            font-size: .875rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 3px;
+        }
+
+        .pf-danger-sub {
+            font-size: .75rem;
+            color: var(--ink-3);
+        }
+
+        /* PREF CARD fills remaining height */
+        .pf-card-pref {
+            height: 100%;
+        }
     </style>
+
+    @yield('extra-css')
 </head>
 
 <body>
@@ -2555,44 +2928,48 @@
     {{-- NAVBAR --}}
     <nav class="navbar">
         <div class="nav-inner">
-            <a href="{{ route('home') }}" class="nav-logo"> ✦ <span>Novela</span></a>
 
+            {{-- LEFT: LOGO --}}
+            <a href="{{ route('home') }}" class="nav-logo">
+                ✦ <span>Novela</span>
+            </a>
+
+            {{-- CENTER: MENU --}}
             <div class="nav-links">
                 <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                        stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                     </svg>
                     <span>Beranda</span>
                 </a>
+
                 <a href="{{ route('search') }}" class="nav-link {{ request()->routeIs('search') ? 'active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                        stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.35-4.35" />
                     </svg>
                     <span>Jelajahi</span>
                 </a>
+
                 <a href="{{ route('genres') }}" class="nav-link {{ request()->routeIs('genres') ? 'active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                        stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
                     <span>Genre</span>
                 </a>
+
                 @auth
                     <a href="{{ route('history') }}" class="nav-link {{ request()->routeIs('history') ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <circle cx="12" cy="12" r="10" />
                             <path d="M12 6v6l4 2" />
                         </svg>
                         <span>Riwayat</span>
                     </a>
+
                     <a href="{{ route('favorites') }}"
                         class="nav-link {{ request()->routeIs('favorites') ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path
                                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
@@ -2601,50 +2978,63 @@
                 @endauth
             </div>
 
-            @auth
-                <div class="nav-user-menu">
-                    <div class="nav-avatar" onclick="toggleDropdown()">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                    </div>
-                    <div class="user-dropdown" id="user-dropdown">
-                        <div class="dropdown-header">
-                            <div class="dh-name">{{ Auth::user()->name }}</div>
-                            <div class="dh-email">{{ Auth::user()->email }}</div>
-                            <span class="badge badge-blue" style="margin-top:8px">{{ ucfirst(Auth::user()->role) }}</span>
+            {{-- RIGHT: USER / AUTH --}}
+            <div class="nav-right">
+                @auth
+                    <div class="nav-user-menu">
+                        <div class="nav-avatar" onclick="toggleDropdown()">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
                         </div>
-                        <a href="{{ route('reader.profile.index') }}" class="dropdown-item">
-                            <span class="di-icon">👤</span> Profil Saya
-                        </a>
-                        @if (Auth::user()->role === 'reader')
-                            <a href="{{ route('reader.author-request') }}" class="dropdown-item">
-                                <span class="di-icon">✍️</span> Jadi Penulis
-                            </a>
-                        @endif
-                        @if (Auth::user()->role === 'author')
-                            <a href="{{ route('author.dashboard') }}" class="dropdown-item">
-                                <span class="di-icon">📊</span> Dashboard Penulis
-                            </a>
-                        @endif
-                        @if (Auth::user()->role === 'admin')
-                            <a href="{{ route('admin.dashboard') }}" class="dropdown-item">
-                                <span class="di-icon">🛡️</span> Dashboard Admin
-                            </a>
-                        @endif
-                        <div class="dropdown-divider"></div>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="dropdown-item danger">
-                                <span class="di-icon">🚪</span> Keluar
-                            </button>
-                        </form>
+
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="dropdown-header">
+                                <div class="dh-name">{{ Auth::user()->name }}</div>
+                                <div class="dh-email">{{ Auth::user()->email }}</div>
+                                <span class="badge badge-blue" style="margin-top:8px">
+                                    {{ ucfirst(Auth::user()->role) }}
+                                </span>
+                            </div>
+
+                            {{-- PROFIL --}}
+                            @if (Auth::user()->role === 'admin')
+                                <a href="{{ route('admin.dashboard') }}" class="dropdown-item">👤 Profil Saya</a>
+                            @elseif (Auth::user()->role === 'author')
+                                <a href="{{ route('author.profile.index') }}" class="dropdown-item">👤 Profil Saya</a>
+                            @else
+                                <a href="{{ route('reader.profile.index') }}" class="dropdown-item">👤 Profil Saya</a>
+                            @endif
+
+                            {{-- ROLE EXTRA --}}
+                            @if (Auth::user()->role === 'reader')
+                                <a href="{{ route('reader.author-request') }}" class="dropdown-item">✍️ Jadi Penulis</a>
+                            @endif
+
+                            @if (Auth::user()->role === 'author')
+                                <a href="{{ route('author.dashboard') }}" class="dropdown-item">📊 Dashboard Penulis</a>
+                            @endif
+
+                            @if (Auth::user()->role === 'admin')
+                                <a href="{{ route('admin.dashboard') }}" class="dropdown-item">🛡️ Dashboard Admin</a>
+                            @endif
+
+                            <div class="dropdown-divider"></div>
+
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="dropdown-item danger">
+                                    🚪 Keluar
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            @else
-                <div class="nav-auth">
-                    <a href="{{ route('login') }}" class="btn-ghost-nav">Masuk</a>
-                    <a href="{{ route('register') }}" class="btn-primary-nav">Daftar</a>
-                </div>
-            @endauth
+                @else
+                    <div class="nav-auth">
+                        <a href="{{ route('login') }}" class="btn-ghost-nav">Masuk</a>
+                        <a href="{{ route('register') }}" class="btn-primary-nav">Daftar</a>
+                    </div>
+                @endauth
+            </div>
+
         </div>
     </nav>
 

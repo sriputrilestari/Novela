@@ -11,7 +11,7 @@ class AuthorRequestController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('reader.author-request', compact('user'))->with('currentUser', $user);
+        return view('pages.authorrequest', compact('user'))->with('currentUser', $user);
     }
 
     public function submit(Request $request)

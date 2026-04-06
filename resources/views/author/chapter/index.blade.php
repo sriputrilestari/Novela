@@ -685,7 +685,6 @@
                 <table>
                     <thead>
                         <tr>
-                            <th width="48">#</th>
                             <th width="70">No.</th>
                             <th>Judul Chapter</th>
                             <th width="130">Status</th>
@@ -696,8 +695,6 @@
 
                         @forelse($chapters as $index => $chapter)
                             <tr>
-                                <td>{{ $index + 1 }}</td>
-
                                 <td>
                                     <span class="num-badge">{{ $chapter->urutan }}</span>
                                 </td>

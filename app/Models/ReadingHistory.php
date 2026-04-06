@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +16,12 @@ class ReadingHistory extends Model
         'last_read_at',
     ];
 
+    public $timestamps = false;
+
+    protected $casts = [
+        'last_read_at' => 'datetime',
+    ];
+
     // relasi ke User
     public function user()
     {
@@ -28,4 +33,5 @@ class ReadingHistory extends Model
     {
         return $this->belongsTo(Chapter::class);
     }
+
 }

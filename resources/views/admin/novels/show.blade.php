@@ -51,10 +51,10 @@
                                 <span class="text-muted small"><i class="fas fa-tags fa-fw mr-2"></i>Genre</span>
                                 <span class="small font-weight-bold">{{ $novel->genre?->nama_genre ?? '-' }}</span>
                             </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                            <!-- <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
                                 <span class="text-muted small"><i class="fas fa-eye fa-fw mr-2"></i>Views</span>
                                 <span class="small font-weight-bold">{{ number_format($novel->views ?? 0) }}</span>
-                            </li>
+                            </li> -->
                             <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
                                 <span class="text-muted small"><i class="fas fa-list fa-fw mr-2"></i>Chapter</span>
                                 <span class="small font-weight-bold">{{ $novel->chapters?->count() ?? 0 }}</span>

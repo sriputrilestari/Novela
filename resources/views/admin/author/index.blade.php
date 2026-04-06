@@ -97,7 +97,7 @@
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Author Diblokir</div>
                                 <div class="h4 mb-0 font-weight-bold text-gray-800">
-                                    {{ \App\Models\User::where('role', 'author')->where('is_blocked', true)->count() }}
+                                    {{ \App\Models\User::where('role', 'author')->where('is_active', false)->count() }}
                                 </div>
                             </div>
                             <div class="col-auto">
@@ -136,10 +136,9 @@
                             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
                                 data-toggle="dropdown">
                                 <i class="fas fa-filter mr-1"></i>
-                                {{ request('filter') === 'active' ? 'Aktif' : (request('filter') === 'blocked' ? 'Diblokir' : (request('filter') === 'pending' ? 'Pending' : 'Semua')) }}
+                                {{ request('filter') === 'active' ? 'Aktif' : (request('filter') === 'blocked' ? 'Diblokir' : 'Semua') }}
                             </button>
                             <div class="dropdown-menu dropdown-menu-right shadow-sm border-0">
-                                <h6 class="dropdown-header text-uppercase small">Filter Status</h6>
                                 <a class="dropdown-item {{ !request('filter') || request('filter') === 'all' ? 'active' : '' }}"
                                     href="?filter=all">
                                     <i class="fas fa-users fa-fw mr-2"></i>Semua Author
@@ -151,10 +150,6 @@
                                 <a class="dropdown-item {{ request('filter') === 'blocked' ? 'active' : '' }}"
                                     href="?filter=blocked">
                                     <i class="fas fa-ban fa-fw mr-2 text-danger"></i>Author Diblokir
-                                </a>
-                                <a class="dropdown-item {{ request('filter') === 'pending' ? 'active' : '' }}"
-                                    href="?filter=pending">
-                                    <i class="fas fa-clock fa-fw mr-2 text-warning"></i>Author Pending
                                 </a>
                             </div>
                         </div>
@@ -223,7 +218,7 @@
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">
-                                        @if ($author->is_blocked)
+                                        @if (!$author->is_active)
                                             <span class="badge badge-pill badge-danger px-3 py-2">
                                                 <i class="fas fa-ban mr-1"></i>Diblokir
                                             </span>
@@ -234,13 +229,13 @@
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">
-                                        <a href="{{ route('admin.authors.show', $author->id) }}"
+                                        <a href="{{ route('admin.author.show', $author->id) }}"
                                             class="btn btn-sm btn-info" title="Detail Author"
                                             style="width:32px; height:32px; padding:0; line-height:32px;">
                                             <i class="fas fa-eye"></i>
                                         </a>
 
-                                        <form action="{{ route('admin.authors.toggle', $author->id) }}" method="POST"
+                                        <form action="{{ route('admin.author.toggle', $author->id) }}" method="POST"
                                             class="d-inline"
                                             onsubmit="return confirm('{{ $author->is_active ? 'Nonaktifkan' : 'Aktifkan' }} akun author ini?')">
                                             @csrf
@@ -252,8 +247,8 @@
                                             </button>
                                         </form>
 
-                                        @if (!$author->is_blocked)
-                                            <form action="{{ route('admin.authors.block', $author->id) }}" method="POST"
+                                       @if ($author->is_active)
+                                            <form action="{{ route('admin.author.block', $author->id) }}" method="POST"
                                                 class="d-inline"
                                                 onsubmit="return confirm('Author akan diblokir dan tidak bisa login. Yakin?')">
                                                 @csrf
@@ -291,7 +286,7 @@
                         dari <strong>{{ $authors->total() }}</strong> author
                     </div>
                     <div>
-                        {{ $authors->links() }}
+                       {{ $authors->appends(request()->query())->links() }}
                     </div>
                 </div>
             @endif
