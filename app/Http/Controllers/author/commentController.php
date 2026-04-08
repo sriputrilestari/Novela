@@ -34,9 +34,9 @@ class CommentController extends Controller
         }
         // 'all' → tampilkan semua (termasuk yang hidden), ini panel author
 
-        $comments    = $query->paginate(10)->withQueryString();
-        $totalAll    = $this->countFilter('all');
-        $totalToxic  = $this->countFilter('toxic');
+        $comments   = $query->paginate(10)->withQueryString();
+        $totalAll   = $this->countFilter('all');
+        $totalToxic = $this->countFilter('toxic');
 
         return view('author.comment.index', compact(
             'comments', 'filter', 'totalAll', 'totalToxic'
@@ -47,18 +47,18 @@ class CommentController extends Controller
     // SHOW — Detail 1 komentar + semua reply-nya
     // GET /author/comments/{id}
     // ──────────────────────────────────────────────────────────
-    public function show($id)
-    {
-        $comment = Comment::with([
-            'user',
-            'chapter.novel',
-            'replies.user',
-        ])->findOrFail($id);
+    // public function show($id)
+    // {
+    //     $comment = Comment::with(['user', 'chapter.novel', 'replies.user'])
+    //         ->findOrFail($id);
 
-        $this->gate($comment);
+    //     // VALIDASI
+    //     if ($comment->chapter->novel->author_id !== Auth::id()) {
+    //         abort(403, 'Ini bukan komentar milik kamu');
+    //     }
 
-        return view('author.comment.show', compact('comment'));
-    }
+    //     return view('author.comment.show', compact('comment'));
+    // }
 
     // ──────────────────────────────────────────────────────────
     // REPLY — Author balas komentar reader
@@ -141,9 +141,11 @@ class CommentController extends Controller
     private function countFilter(string $filter): int
     {
         $q = Comment::whereNull('parent_id')
-                    ->whereHas('chapter.novel', fn($q) => $q->where('author_id', Auth::id()));
+            ->whereHas('chapter.novel', fn($q) => $q->where('author_id', Auth::id()));
 
-        if ($filter === 'toxic') $q->where('is_toxic', true);
+        if ($filter === 'toxic') {
+            $q->where('is_toxic', true);
+        }
 
         return $q->count();
     }

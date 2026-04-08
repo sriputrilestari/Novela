@@ -56,12 +56,11 @@ class ChapterController extends Controller
             ->count();
 
         // Komentar chapter
-        $comments = Comment::with('user')
+        $comments = Comment::with(['user', 'visibleReplies.user'])
+            ->visible()
+            ->topLevel()
             ->where('chapter_id', $chapter->id)
-            ->whereNull('parent_id')
-            ->where('is_hidden', 0)
             ->latest()
-            ->take(20)
             ->get();
 
         // Bookmark status

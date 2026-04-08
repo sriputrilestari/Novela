@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
@@ -11,14 +10,17 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'chapter_id' => 'required',
-            'komentar' => 'required'
+            'chapter_id' => 'required|exists:chapters,id',
+            'komentar'   => 'required|string|max:1000',
+            'parent_id'  => 'nullable|exists:comments,id',
+
         ]);
 
         Comment::create([
-            'user_id' => Auth::id(),
+            'user_id'    => Auth::id(),
             'chapter_id' => $request->chapter_id,
-            'komentar' => $request->komentar
+            'komentar'   => $request->komentar,
+            'parent_id'  => $request->parent_id ?? null, // 🔥 INI KUNCI
         ]);
 
         return back()->with('success', 'Komentar berhasil ditambahkan');

@@ -9,7 +9,7 @@
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb" style="background:transparent; padding:0; font-size:.85rem;">
             <li class="breadcrumb-item">
-                <a href="{{ route('author.comments.index') }}" style="color:#5B8DEF;">Komentar</a>
+                <a href="{{ route('author.comment.index') }}" style="color:#5B8DEF;">Komentar</a>
             </li>
             <li class="breadcrumb-item active text-gray-700 font-weight-bold">Detail</li>
         </ol>
@@ -86,7 +86,7 @@
                         {{-- Tombol Aksi --}}
                         <div class="d-flex" style="gap:.5rem;">
                             @if (!$comment->is_toxic)
-                                <form method="POST" action="{{ route('author.comments.toxic', $comment->id) }}"
+                                <form method="POST" action="{{ route('author.comment.toxic', $comment->id) }}"
                                     onsubmit="return confirm('Tandai komentar ini sebagai toxic?')">
                                     @csrf @method('PATCH')
                                     <button type="submit" class="btn btn-sm btn-warning">
@@ -95,7 +95,7 @@
                                 </form>
                             @endif
 
-                            <form method="POST" action="{{ route('author.comments.destroy', $comment->id) }}"
+                            <form method="POST" action="{{ route('author.comment.destroy', $comment->id) }}"
                                 onsubmit="return confirm('Hapus komentar ini PERMANEN beserta semua balasannya?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">
@@ -167,7 +167,7 @@
                                 </div>
 
                                 {{-- Hapus reply --}}
-                                <form method="POST" action="{{ route('author.comments.destroy', $reply->id) }}"
+                                <form method="POST" action="{{ route('author.comment.destroy', $reply->id) }}"
                                     class="ml-2 flex-shrink-0" onsubmit="return confirm('Hapus balasan ini?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-link text-muted p-1" title="Hapus balasan"
@@ -190,7 +190,7 @@
                     </span>
                 </div>
                 <div class="card-body px-4 py-4">
-                    <form method="POST" action="{{ route('author.comments.reply', $comment->id) }}">
+                    <form method="POST" action="{{ route('author.comment.reply', $comment->id) }}">
                         @csrf
                         <div class="form-group">
                             <textarea name="komentar" rows="4" required maxlength="1000" placeholder="Tulis balasanmu di sini..."
@@ -203,7 +203,7 @@
                             <small class="form-text text-muted">Maks. 1000 karakter</small>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('author.comments.index') }}" class="btn btn-outline-secondary btn-sm">
+                            <a href="{{ route('author.comment.index') }}" class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-arrow-left mr-1"></i>Kembali
                             </a>
                             <button type="submit" class="btn btn-primary">
@@ -257,7 +257,6 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 

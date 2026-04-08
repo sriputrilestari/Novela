@@ -61,7 +61,7 @@
         </div>
 
         {{-- Flash message --}}
-        @if (session('success'))
+        {{-- @if (session('success'))
             <div
                 style="background:#e0faf5;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#00a08a;font-weight:600;">
                 ✅ {{ session('success') }}
@@ -72,7 +72,7 @@
                 style="background:#fef0ee;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#c43020;font-weight:600;">
                 ⚠️ {{ session('error') }}
             </div>
-        @endif
+        @endif --}}
 
         {{-- ═══ ISI CHAPTER ═══ --}}
         <div id="reader-content"
@@ -85,9 +85,32 @@
 
             <div
                 style="text-align:center;padding:32px 0;border-top:2px dashed var(--border);border-bottom:2px dashed var(--border);margin:32px 0">
+
                 <div style="font-size:1.5rem;margin-bottom:8px">✦</div>
-                <div style="font-family:'Crimson Pro',serif;font-size:1rem;color:var(--text-muted)">Akhir Chapter
-                    {{ $chapter->urutan }}</div>
+
+                <div style="font-family:'Crimson Pro',serif;font-size:1rem;color:var(--text-muted);margin-bottom:16px">
+                    Akhir Chapter {{ $chapter->urutan }}
+                </div>
+
+                {{-- 🔥 BUTTON NEXT CHAPTER --}}
+                @if ($nextChapter)
+                    <a href="{{ route('chapter.show', $nextChapter->id) }}"
+                        style="display:inline-flex;align-items:center;gap:8px;
+                  padding:10px 18px;
+                  border-radius:999px;
+                  background:linear-gradient(to right,var(--accent),var(--accent2));
+                  color:white;
+                  font-size:.85rem;
+                  text-decoration:none;
+                  transition:.3s">
+                        Lanjut ke Chapter {{ $nextChapter->urutan }} →
+                    </a>
+                @else
+                    <div style="font-size:.85rem;color:var(--text-muted)">
+                        🎉 Kamu sudah sampai chapter terakhir!
+                    </div>
+                @endif
+
             </div>
         </div>
 
@@ -123,6 +146,31 @@
                             <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
                         <div class="comment-text">{{ $comment->komentar }}</div>
+
+                        {{-- 🔥 REPLIES --}}
+                        @foreach ($comment->visibleReplies as $reply)
+                            <div
+                                style="margin-top:12px;margin-left:30px;border-left:2px solid var(--border);padding-left:12px">
+
+                                <div class="comment-user">
+                                    {{ $reply->user->name }}
+
+                                    {{-- 🔥 TANDA AUTHOR --}}
+                                    @if ($reply->user->role === 'author')
+                                        <span style="color:gold;font-size:11px;margin-left:6px">Author</span>
+                                    @endif
+
+                                    <span class="comment-time">
+                                        {{ $reply->created_at->diffForHumans() }}
+                                    </span>
+                                </div>
+
+                                <div class="comment-text">
+                                    {{ $reply->komentar }}
+                                </div>
+
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             @empty
@@ -135,7 +183,7 @@
     </div>{{-- /reader-wrap --}}
 
     {{-- ═══ READER NAV (fixed bottom) ═══ --}}
-    <div
+    {{-- <div
         style="position:fixed;bottom:0;left:0;right:0;z-index:90;background:rgba(7,12,36,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 40px">
         @if ($prevChapter)
             <a href="{{ route('chapter.show', $prevChapter->id) }}" class="btn-outline">←
@@ -161,13 +209,13 @@
         @else
             <button class="btn-primary" disabled style="opacity:.4">Tamat 🎉</button>
         @endif
-    </div>
+    </div> --}}
 
     {{-- padding bawah agar konten tidak tertutup nav --}}
     <div style="height:72px"></div>
 
     {{-- ✅ Modal Report --}}
-    @include('components.modal-report', ['novelId' => $chapter->novel->id])
+    @include('layouts.componen_reader.modal_report', ['novelId' => $chapter->novel->id])
 
 @endsection
 

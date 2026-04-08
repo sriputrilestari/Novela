@@ -93,7 +93,6 @@
           ['icon'=>'✍️','title'=>'Tulis Novel','desc'=>'Buat dan publikasikan novel sendiri'],
           ['icon'=>'📊','title'=>'Statistik','desc'=>'Pantau views dan pembaca'],
           ['icon'=>'💬','title'=>'Interaksi','desc'=>'Balas komentar pembaca'],
-          ['icon'=>'🏆','title'=>'Monetisasi','desc'=>'Penghasilan dari karyamu'],
         ] as $b)
         <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px;backdrop-filter:blur(4px)">
           <div style="font-size:1.3rem;margin-bottom:6px">{{ $b['icon'] }}</div>
@@ -120,7 +119,7 @@
       <form action="{{ route('reader.author-request.submit') }}" method="POST">
         @csrf
         <div class="form-group">
-          <label class="form-label">Nama Pena <span style="color:var(--red)">*</span></label>
+          <label class="form-label">Nama<span style="color:var(--red)">*</span></label>
           <input class="form-input" name="pen_name" value="{{ old('pen_name', auth()->user()->name) }}" placeholder="Nama yang akan tampil sebagai penulis" required/>
         </div>
 
@@ -182,7 +181,6 @@
       @foreach([
         'Proses review memakan waktu 1–3 hari kerja',
         'Akun harus sudah terverifikasi email',
-        'Minimal sudah membaca 5 novel di Novela',
         'Konten yang dibuat harus orisinal dan tidak plagiat',
         'Penulis wajib update minimal 1 chapter per minggu',
       ] as $info)

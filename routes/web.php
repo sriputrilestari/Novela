@@ -171,12 +171,12 @@ Route::middleware(['auth', 'role:author'])
 
         // COMMENT
         Route::get('/comments', [\App\Http\Controllers\Author\CommentController::class, 'index'])->name('comment.index');
-        Route::get('/comments/{id}', [\App\Http\Controllers\Author\CommentController::class, 'show'])->name('comment.show');
+        // Route::get('/comments/{id}', [\App\Http\Controllers\Author\CommentController::class, 'show'])->name('comment.show');
         Route::post('/comments/{id}/reply', [\App\Http\Controllers\Author\CommentController::class, 'reply'])->name('comment.reply');
         Route::patch('/comments/{id}/toxic', [\App\Http\Controllers\Author\CommentController::class, 'markToxic'])->name('comment.toxic');
         Route::delete('/comments/{id}', [\App\Http\Controllers\Author\CommentController::class, 'destroy'])->name('comment.destroy');
 
-        // ✅ REPORTS — tambah show
+        // REPORTS
         Route::get('/reports', [AuthorReportController::class, 'index'])->name('report.index');
         Route::get('/reports/{id}', [AuthorReportController::class, 'show'])->name('report.show');
     });

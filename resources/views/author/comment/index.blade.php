@@ -786,8 +786,8 @@
 
                     {{-- Action buttons --}}
                     <div class="cm-acts">
-                        <a href="{{ route('author.comment.show', $comment->id) }}" class="act-btn btn-view"
-                            title="Detail">👁</a>
+                        {{-- <a href="{{ route('author.comment.show', $comment->id) }}" class="act-btn btn-view"
+                            title="Detail">👁</a> --}}
 
                         @if (!$isToxic)
                             <form method="POST" action="{{ route('author.comment.toxic', $comment->id) }}"
