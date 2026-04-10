@@ -24,11 +24,21 @@
                     <div class="alert alert-danger border-0 shadow-sm mb-4">
                         <div class="d-flex">
                             <i class="fas fa-exclamation-circle fa-lg mr-3 mt-1"></i>
-                            <ul class="mb-0 pl-0" style="list-style: none;">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                            <div>
+                                <strong>Terjadi kesalahan:</strong>
+                                <ul class="mb-0 pl-0 mt-1" style="list-style: none;">
+                                    @foreach ($errors->all() as $error)
+                                        <li>
+                                            •
+                                            {{ str_replace(
+                                                ['The nama genre has already been taken.', 'The nama genre field is required.'],
+                                                ['Nama genre sudah digunakan.', 'Nama genre wajib diisi.'],
+                                                $error,
+                                            ) }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -59,7 +69,13 @@
                                         placeholder="Contoh: Romantis, Fantasi, Thriller..." value="{{ old('nama_genre') }}"
                                         required autofocus>
                                     @error('nama_genre')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">
+                                            {{ str_replace(
+                                                ['The nama genre has already been taken.', 'The nama genre field is required.'],
+                                                ['Nama genre sudah digunakan.', 'Nama genre wajib diisi.'],
+                                                $message,
+                                            ) }}
+                                        </div>
                                     @enderror
                                 </div>
                                 <small class="text-muted">Nama genre harus unik dan belum pernah ditambahkan

@@ -1,8 +1,6 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-    <!-- Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center"
-       href="{{ route('author.dashboard') }}">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('author.dashboard') }}">
         <div class="sidebar-brand-icon">
             <i class="fas fa-feather-alt"></i>
         </div>
@@ -11,7 +9,6 @@
 
     <hr class="sidebar-divider my-0">
 
-    <!-- Dashboard -->
     <li class="nav-item {{ request()->routeIs('author.dashboard') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('author.dashboard') }}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -25,7 +22,6 @@
         Konten
     </div>
 
-    <!-- Novel -->
     <li class="nav-item {{ request()->routeIs('author.novel.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('author.novel.index') }}">
             <i class="fas fa-fw fa-book"></i>
@@ -33,7 +29,6 @@
         </a>
     </li>
 
-    <!-- Komentar -->
     <li class="nav-item {{ request()->routeIs('author.comment.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('author.comment.index') }}">
             <i class="fas fa-fw fa-comments"></i>
@@ -41,8 +36,7 @@
         </a>
     </li>
 
-     <!-- Report -->
-    <li class="nav-item {{ request()->routeIs('author.comment.*') ? 'active' : '' }}">
+    <li class="nav-item {{ request()->routeIs('author.report.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('author.report.index') }}">
             <i class="fas fa-fw fa-flag"></i>
             <span>Novel Report</span>
@@ -55,7 +49,6 @@
         Akun
     </div>
 
-    <!-- Profile -->
     <li class="nav-item {{ request()->routeIs('author.profile.*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('author.profile.index') }}">
             <i class="fas fa-fw fa-user"></i>
@@ -63,7 +56,7 @@
         </a>
     </li>
 
-      {{-- Logout --}}
+    {{-- Logout --}}
     <li class="nav-item">
         <a class="nav-link" href="{{ route('logout') }}"
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
