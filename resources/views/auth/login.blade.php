@@ -304,9 +304,45 @@
             border: 2px solid #fecaca;
         }
         @media (max-width: 768px) {
+            body {
+                align-items: stretch;
+                justify-content: flex-start;
+                padding: 0;
+                overflow: auto;
+            }
+            .login-container {
+                max-width: 100%;
+                min-height: 100vh;
+            }
+            .login-card {
+                min-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
             .login-left { display: none; }
-            .login-right { padding: 50px 35px; }
+            .login-right {
+                padding: 36px 22px;
+                justify-content: flex-start;
+            }
+            .login-header {
+                margin-bottom: 32px;
+            }
+            .login-header h1 {
+                font-size: 1.8rem;
+            }
+            .remember-forgot {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
             body::before, body::after { display: none; }
+        }
+        @media (max-width: 420px) {
+            .login-right { padding: 28px 16px; }
+            .form-control {
+                padding: 14px 16px;
+                padding-right: 46px;
+            }
         }
         .btn-login.loading {
             pointer-events: none;
@@ -339,7 +375,7 @@
                         <i class="fas fa-book-open"></i>
                     </div>
                     <h2>Novela</h2>
-                    <p>Buat akun terlebih dahulu agar anda bisa memulai membaca</p>
+                    <p>Masuk untuk melanjutkan membaca, menyimpan favorit, dan memberi rating novel.</p>
                     <div class="feature-list">
                         <div class="feature-item">
                             <i class="fas fa-check"></i>

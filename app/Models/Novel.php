@@ -14,6 +14,8 @@ class Novel extends Model
         'cover',
         'approval_status',
         'views',
+        'rating',
+        'total_rating',
     ];
 
     // RELASI

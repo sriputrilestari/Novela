@@ -286,15 +286,36 @@
             border: 2px solid #fecaca;
         }
         @media (max-width: 768px) {
+            body {
+                align-items: stretch;
+                justify-content: flex-start;
+                padding: 0;
+                overflow: auto;
+            }
+            .register-container {
+                max-width: 100%;
+                min-height: 100vh;
+            }
+            .register-card {
+                max-height: none;
+                min-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
             .register-left { display: none; }
-            .register-right { 
-                padding: 40px 30px;
-                max-height: 100vh;
+            .register-right {
+                padding: 32px 22px;
+                max-height: none;
             }
             .register-header h1 {
                 font-size: 1.7rem;
             }
             body::before, body::after { display: none; }
+        }
+        @media (max-width: 420px) {
+            .register-right { padding: 28px 16px; }
+            .form-control, .form-select { padding: 13px 16px; }
+            .form-control { padding-right: 44px; }
         }
         .btn-register.loading {
             pointer-events: none;

@@ -94,6 +94,12 @@ class NovelController extends Controller
             ->exists()
             : false;
 
+        $userRating = Auth::check()
+            ? Rating::where('user_id', Auth::id())
+                ->where('novel_id', $id)
+                ->value('rating')
+            : null;
+
         // Last read chapter for this user
         $lastReadChapter = null;
         if (Auth::check()) {
@@ -115,7 +121,8 @@ class NovelController extends Controller
             'bookmarkCount',
             'commentCount',
             'isBookmarked',
-            'lastReadChapter'
+            'lastReadChapter',
+            'userRating'
         ));
     }
 
@@ -215,9 +222,15 @@ class NovelController extends Controller
     // POST /novel/{id}/rate
     public function rate(Request $request, $id)
     {
+        if (! Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu untuk memberi rating.');
+        }
+
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
         ]);
+
+        $novel = Novel::where('approval_status', 'published')->findOrFail($id);
 
         // simpan / update rating user
         Rating::updateOrCreate(
@@ -233,8 +246,6 @@ class NovelController extends Controller
         // hitung ulang rata-rata
         $avg   = Rating::where('novel_id', $id)->avg('rating');
         $count = Rating::where('novel_id', $id)->count();
-
-        $novel = Novel::findOrFail($id);
 
         $novel->update([
             'rating'       => round($avg, 2),
