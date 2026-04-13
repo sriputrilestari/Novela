@@ -6,15 +6,72 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Novela')</title>
+    @php
+        $assetVersion = function (string $path): string {
+            $fullPath = public_path($path);
+
+            return asset($path) . (file_exists($fullPath) ? '?v=' . filemtime($fullPath) : '');
+        };
+    @endphp
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('css/novela/variables.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/novela/base.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/novela/components.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/novela/pages.css') }}" />
+    <link rel="stylesheet" href="{{ $assetVersion('css/novela/variables.css') }}" />
+    <link rel="stylesheet" href="{{ $assetVersion('css/novela/base.css') }}" />
+    <link rel="stylesheet" href="{{ $assetVersion('css/novela/components.css') }}" />
+    <link rel="stylesheet" href="{{ $assetVersion('css/novela/pages.css') }}" />
+    <style>
+        /* Critical navbar fallback so hosted pages do not depend on stale cached CSS. */
+        .topbar-shell {
+            width: min(100%, 1320px);
+            margin: 0 auto;
+            padding: 14px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .topbar-search-form {
+            width: auto;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .desktop-nav {
+            display: none;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 1024px) {
+            .desktop-nav {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .topbar-search-form {
+                width: min(100%, 250px);
+                flex: 0 1 250px;
+            }
+
+            .topbar-shell {
+                gap: 24px;
+                padding: 16px 30px;
+            }
+        }
+    </style>
     @stack('styles')
 </head>
 
@@ -145,10 +202,10 @@
         }
     </script>
 
-    <script src="{{ asset('js/novela/ui.js') }}"></script>
-    <script src="{{ asset('js/novela/navigation.js') }}"></script>
-    <script src="{{ asset('js/novela/reader.js') }}"></script>
-    <script src="{{ asset('js/novela/app.js') }}"></script>
+    <script src="{{ $assetVersion('js/novela/ui.js') }}"></script>
+    <script src="{{ $assetVersion('js/novela/navigation.js') }}"></script>
+    <script src="{{ $assetVersion('js/novela/reader.js') }}"></script>
+    <script src="{{ $assetVersion('js/novela/app.js') }}"></script>
     @stack('scripts')
 </body>
 

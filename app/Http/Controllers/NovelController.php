@@ -19,8 +19,10 @@ class NovelController extends Controller
     {
         $publishedQuery = Novel::query()
             ->where('approval_status', 'published');
+        $hasPublished = (clone $publishedQuery)->exists();
+        $baseQuery = $hasPublished ? $publishedQuery : Novel::query();
 
-        $featured = (clone $publishedQuery)
+        $featured = (clone $baseQuery)
             ->orderByDesc('rating')
             ->orderByDesc('total_rating')
             ->orderByDesc('views')
@@ -29,7 +31,7 @@ class NovelController extends Controller
             ->first();
 
         // Novel Terbaru — urut dari yang terbaru dibuat (tampil kiri = grid auto-fill)
-        $latestNovels = (clone $publishedQuery)
+        $latestNovels = (clone $baseQuery)
             ->orderByDesc('created_at')
             ->with(['author', 'genre'])
             ->withCount('chapters')
@@ -37,14 +39,14 @@ class NovelController extends Controller
             ->get();
 
         // Novel Populer — diambil dari views terbanyak
-        $popularNovels = (clone $publishedQuery)
+        $popularNovels = (clone $baseQuery)
             ->with(['author', 'genre'])
             ->withCount('chapters')
             ->orderByRaw('views DESC, rating DESC, total_rating DESC, created_at DESC')
             ->limit(20)
             ->get();
 
-        $featuredNovels = (clone $publishedQuery)
+        $featuredNovels = (clone $baseQuery)
             ->with(['author', 'genre'])
             ->withCount('chapters')
             ->orderByDesc('rating')
@@ -86,6 +88,7 @@ class NovelController extends Controller
             'featuredNovels',
             'latestNovels',
             'popularNovels',
+            'hasPublished',
             'stats',
             'readingHistory'
         ));
