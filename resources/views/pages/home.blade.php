@@ -12,7 +12,7 @@
         <section class="hero-home-shell">
         <div class="hero-banner hero-banner-home">
             <div class="hero-copy-home">
-                <div class="hero-badge">Novel Pilihan</div>
+                <div class="hero-badge">Novel Pilihan Baru</div>
                 <div class="hero-title">{{ $featured->judul }}</div>
                 <div class="hero-author">oleh <strong>{{ $featured->author->name }}</strong></div>
                 <div class="hero-desc">{{ \Illuminate\Support\Str::limit($featured->sinopsis, 180) }}</div>
