@@ -73,8 +73,6 @@ Route::middleware('auth')->group(function () {
 
     // 📚 History
     Route::get('/history', [ReadingHistoryController::class, 'index'])->name('history');
-
-    // 🚩 Report Novel (semua role yang login bisa lapor)
     Route::post('/novel/{id}/report', [ReaderReportController::class, 'store'])->name('novel.report');
 });
 
