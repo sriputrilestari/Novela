@@ -8,7 +8,7 @@
 @endphp
 
 @section('content')
-    @if (! $hasPublished)
+    @if (!$hasPublished)
         <div class="content-wrap content-wrap-home" style="padding-bottom:0;">
             <div class="alert alert-warning" style="margin-bottom:20px;">
                 Belum ada novel berstatus <strong>published</strong>. Menampilkan semua data sementara.
@@ -31,7 +31,8 @@
                                 <span class="{{ $i <= round($featured->rating) ? 's-on' : 's-off' }}">*</span>
                             @endfor
                         </span>
-                        <span class="hero-rating">{{ number_format($featured->rating, 1) }} ({{ $featured->total_rating }})</span>
+                        <span class="hero-rating">{{ number_format($featured->rating, 1) }}
+                            ({{ $featured->total_rating }})</span>
                         <span class="hero-tag">{{ $featured->genre->nama_genre }}</span>
                         <span class="hero-tag">{{ ucfirst($featured->status) }}</span>
                         <span class="hero-chapter">{{ $featured->chapters_count }} Chapter</span>
@@ -67,14 +68,16 @@
                         <a href="{{ route('chapter.show', $history->chapter->id) }}" class="reading-item">
                             <div class="reading-cover">
                                 @if ($history->chapter->novel->cover)
-                                    <img src="{{ asset('storage/' . ltrim($history->chapter->novel->cover, '/')) }}" alt="{{ $history->chapter->novel->judul }}" />
+                                    <img src="{{ asset('storage/' . ltrim($history->chapter->novel->cover, '/')) }}"
+                                        alt="{{ $history->chapter->novel->judul }}" />
                                 @else
                                     <div class="hero-cover-placeholder">Cover</div>
                                 @endif
                             </div>
                             <div class="reading-info">
                                 <div class="reading-title">{{ $history->chapter->novel->judul }}</div>
-                                <div class="reading-author">{{ $history->chapter->judul_chapter }} - {{ $history->chapter->novel->genre->nama_genre }}</div>
+                                <div class="reading-author">{{ $history->chapter->judul_chapter }} -
+                                    {{ $history->chapter->novel->genre->nama_genre }}</div>
                             </div>
                             <div class="reading-right">
                                 <span class="text-xs text-muted">{{ $history->last_read_at?->diffForHumans() }}</span>
@@ -87,9 +90,27 @@
 
         @php
             $sections = [
-                ['id' => 'latest', 'title' => 'Novel Terbaru', 'slides' => $latestSlides, 'route' => route('search'), 'showViews' => false],
-                ['id' => 'featured', 'title' => 'Novel Pilihan', 'slides' => $featuredSlides, 'route' => route('search'), 'showViews' => false],
-                ['id' => 'popular', 'title' => 'Novel Populer', 'slides' => $popularSlides, 'route' => route('search', ['sort' => 'popular']), 'showViews' => true],
+                [
+                    'id' => 'latest',
+                    'title' => 'Novel Terbaru',
+                    'slides' => $latestSlides,
+                    'route' => route('search'),
+                    'showViews' => false,
+                ],
+                [
+                    'id' => 'featured',
+                    'title' => 'Novel Pilihan',
+                    'slides' => $featuredSlides,
+                    'route' => route('search'),
+                    'showViews' => false,
+                ],
+                [
+                    'id' => 'popular',
+                    'title' => 'Novel Populer',
+                    'slides' => $popularSlides,
+                    'route' => route('search', ['sort' => 'popular']),
+                    'showViews' => true,
+                ],
             ];
         @endphp
 
@@ -114,7 +135,8 @@
                                             <a href="{{ route('novel.show', $novel->id) }}" class="novel-card">
                                                 <div class="novel-cover">
                                                     @if ($novel->cover)
-                                                        <img src="{{ asset('storage/' . ltrim($novel->cover, '/')) }}" alt="{{ $novel->judul }}" />
+                                                        <img src="{{ asset('storage/' . ltrim($novel->cover, '/')) }}"
+                                                            alt="{{ $novel->judul }}" />
                                                     @else
                                                         <div class="hero-cover-placeholder">Cover</div>
                                                     @endif
@@ -129,7 +151,8 @@
                                                     </div>
                                                     <div class="novel-stars">
                                                         @for ($i = 1; $i <= 5; $i++)
-                                                            <span class="{{ $i <= round($novel->rating) ? 'star-filled' : 'star-empty' }}">*</span>
+                                                            <span
+                                                                class="{{ $i <= round($novel->rating) ? 'star-filled' : 'star-empty' }}">*</span>
                                                         @endfor
                                                         <span>{{ number_format($novel->rating, 1) }}</span>
                                                     </div>
@@ -152,13 +175,16 @@
 
                     @if ($section['slides']->count() > 1)
                         <div class="novel-slider-controls">
-                            <button type="button" class="slider-arrow" data-prev aria-label="Slide sebelumnya"><-</button>
-                            <div class="slider-dots">
-                                @foreach ($section['slides'] as $slideIndex => $unused)
-                                    <button type="button" class="slider-dot {{ $slideIndex === 0 ? 'active' : '' }}" data-dot aria-label="Slide {{ $slideIndex + 1 }}">{{ $slideIndex + 1 }}</button>
-                                @endforeach
-                            </div>
-                            <button type="button" class="slider-arrow" data-next aria-label="Slide berikutnya">-></button>
+                            <button type="button" class="slider-arrow" data-prev aria-label="Slide sebelumnya"><-< /button>
+                                    <div class="slider-dots">
+                                        @foreach ($section['slides'] as $slideIndex => $unused)
+                                            <button type="button"
+                                                class="slider-dot {{ $slideIndex === 0 ? 'active' : '' }}" data-dot
+                                                aria-label="Slide {{ $slideIndex + 1 }}">{{ $slideIndex + 1 }}</button>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="slider-arrow" data-next
+                                        aria-label="Slide berikutnya">-></button>
                         </div>
                     @endif
                 </div>
@@ -169,8 +195,8 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('[data-slider-root]').forEach(function (root) {
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-slider-root]').forEach(function(root) {
                 const track = root.querySelector('[data-slider-track]');
                 const slides = Array.from(root.querySelectorAll('[data-slide]'));
                 const prev = root.querySelector('[data-prev]');
