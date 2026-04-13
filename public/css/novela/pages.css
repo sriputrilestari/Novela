@@ -1,9 +1,20 @@
 .hero-banner {
   width: min(100%, 1180px);
   margin: 0 auto;
-  padding: 24px 16px 12px;
+  padding: 28px 16px 10px;
   display: grid;
   gap: 18px;
+}
+
+.hero-home-shell {
+  background: #121846;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hero-banner-home {
+  min-height: 520px;
+  align-items: center;
 }
 
 .hero-content {
@@ -103,6 +114,23 @@
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32);
+}
+
+.hero-image-home {
+  order: -1;
+  width: min(62vw, 260px);
+}
+
+.hero-copy-home {
+  max-width: 610px;
+}
+
+.content-wrap-home {
+  padding-top: 34px;
+}
+
+.content-wrap-home .novel-section:first-of-type {
+  margin-top: 6px;
 }
 
 .hero-image img {
@@ -458,12 +486,18 @@
   }
 
   .hero-banner {
-    grid-template-columns: 1.3fr 0.9fr;
+    grid-template-columns: 1.2fr 0.8fr;
     align-items: center;
   }
 
   .hero-image {
-    width: 260px;
+    width: 300px;
+  }
+
+  .hero-image-home {
+    order: initial;
+    justify-self: end;
+    width: 300px;
   }
 
   .detail-inner {
@@ -495,17 +529,21 @@
 
 @media (min-width: 1024px) {
   .hero-banner {
-    padding: 32px 32px 12px;
-  }
-
-  .hero-content,
-  .detail-info {
-    padding: 28px;
+    padding: 44px 32px 34px;
   }
 
   .hero-title,
   .detail-title {
-    font-size: 2.3rem;
+    font-size: 3.1rem;
+  }
+
+  .hero-desc {
+    max-width: 560px;
+    font-size: 1rem;
+  }
+
+  .hero-image-home {
+    width: 310px;
   }
 
   .genre-cards-grid {

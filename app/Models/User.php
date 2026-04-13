@@ -28,6 +28,10 @@ class User extends Authenticatable
         'is_active',
         'is_blocked',
         'author_request',
+        'author_request_note',
+        'author_request_date',
+        'author_approved_at',
+        'author_rejected_at',
     ];
 
     /**
@@ -50,6 +54,11 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
+            'is_active'         => 'boolean',
+            'is_blocked'        => 'boolean',
+            'author_request_date' => 'datetime',
+            'author_approved_at'  => 'datetime',
+            'author_rejected_at'  => 'datetime',
         ];
     }
 
@@ -79,6 +88,11 @@ class User extends Authenticatable
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
     }
 
 }

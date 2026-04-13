@@ -12,9 +12,7 @@ html {
 body {
   min-height: 100%;
   font-family: 'Inter', sans-serif;
-  background:
-    radial-gradient(circle at top, rgba(79, 124, 255, 0.18), transparent 32%),
-    linear-gradient(180deg, #050818 0%, #08102a 100%);
+  background: #060a22;
   color: var(--text-white);
   overflow-x: hidden;
 }
@@ -24,9 +22,7 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 15% 20%, rgba(123, 90, 240, 0.12), transparent 18%),
-    radial-gradient(circle at 85% 85%, rgba(79, 124, 255, 0.1), transparent 20%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
 }
 
 a {

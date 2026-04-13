@@ -34,7 +34,7 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Reader</div>
-                                <div class="h4 mb-0 font-weight-bold text-gray-800">{{ $readers->total() }}</div>
+                                <div class="h4 mb-0 font-weight-bold text-gray-800">{{ $totalReader }}</div>
                             </div>
                             <div class="col-auto"><i class="fas fa-users fa-2x text-gray-300"></i></div>
                         </div>
@@ -50,7 +50,7 @@
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pengajuan Pending
                                 </div>
                                 <div class="h4 mb-0 font-weight-bold text-gray-800">
-                                    {{ \App\Models\User::where('role', 'user')->where('author_request', 1)->count() }}
+                                    {{ $pendingRequest }}
                                 </div>
                             </div>
                             <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
@@ -66,7 +66,7 @@
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Reader Aktif</div>
                                 <div class="h4 mb-0 font-weight-bold text-gray-800">
-                                    {{ \App\Models\User::where('role', 'user')->where('is_active', true)->count() }}
+                                    {{ $activeReader }}
                                 </div>
                             </div>
                             <div class="col-auto"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
@@ -82,7 +82,7 @@
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Reader Diblokir</div>
                                 <div class="h4 mb-0 font-weight-bold text-gray-800">
-                                    {{ \App\Models\User::where('role', 'user')->where('is_active', false)->count() }}
+                                    {{ $blockedReader }}
                                 </div>
                             </div>
                             <div class="col-auto"><i class="fas fa-ban fa-2x text-gray-300"></i></div>
@@ -170,7 +170,7 @@
                         </thead>
                         <tbody>
                             @forelse($readers as $index => $reader)
-                                <tr @if ($reader->author_request == 1) style="background-color: #fffdf0;" @endif>
+                                <tr @if ($reader->author_request === 'pending') style="background-color: #fffdf0;" @endif>
                                     <td class="px-4 align-middle text-muted">{{ $readers->firstItem() + $index }}</td>
                                     <td class="align-middle">
                                         <div class="d-flex align-items-center">
@@ -199,15 +199,15 @@
                                         </span>
                                     </td>
                                     <td class="align-middle text-center">
-                                        @if ($reader->author_request == 1)
+                                        @if ($reader->author_request === 'pending')
                                             <span class="badge badge-pill badge-warning px-3 py-2">
                                                 <i class="fas fa-clock mr-1"></i>Pending
                                             </span>
-                                        @elseif($reader->author_request == 2)
+                                        @elseif($reader->author_request === 'approved')
                                             <span class="badge badge-pill badge-success px-3 py-2">
                                                 <i class="fas fa-check mr-1"></i>Approved
                                             </span>
-                                        @elseif($reader->author_request == 3)
+                                        @elseif($reader->author_request === 'rejected')
                                             <span class="badge badge-pill badge-danger px-3 py-2">
                                                 <i class="fas fa-times mr-1"></i>Rejected
                                             </span>
@@ -236,7 +236,7 @@
                                             <i class="fas fa-eye"></i>
                                         </a>
 
-                                        @if ($reader->author_request == 1)
+                                        @if ($reader->author_request === 'pending')
                                             <a href="{{ route('admin.reader.show', $reader->id) }}"
                                                 class="btn btn-sm btn-warning" title="Review Pengajuan"
                                                 style="width:32px; height:32px; padding:0; line-height:32px;">

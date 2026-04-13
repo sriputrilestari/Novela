@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -9,45 +10,36 @@ use Illuminate\Support\Facades\Hash;
 
 class ReaderController extends Controller
 {
-    /**
-     * Display a listing of readers
-     */
-    public function index(Request $request) {
-        $query = User::where('role', 'user')
-            ->withCount('readingHistories');
+    public function index(Request $request)
+    {
+        $query = User::where('role', 'reader')->withCount('readingHistories');
 
-        // 🔍 SEARCH
-        if ($request->search) {
+        if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
                     ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
-        // 🎯 FILTER (PAKAI ANGKA, BUKAN STRING)
         if ($request->filter === 'pending') {
-            $query->where('author_request', 1);
+            $query->where('author_request', 'pending');
         } elseif ($request->filter === 'active') {
-            $query->where('is_active', 1);
+            $query->where('is_active', true);
         } elseif ($request->filter === 'blocked') {
-            $query->where('is_active', 0);
+            $query->where('is_active', false);
         }
 
-        $readers = $query->latest()->paginate(10);
+        $readers = $query->latest()->paginate(10)->withQueryString();
 
-        // 📊 STATISTIK (FIX JUGA)
-        $totalReader = User::where('role', 'user')->count();
-
-        $pendingRequest = User::where('role', 'user')
-            ->where('author_request', 1)
+        $totalReader = User::where('role', 'reader')->count();
+        $pendingRequest = User::where('role', 'reader')
+            ->where('author_request', 'pending')
             ->count();
-
-        $activeReader = User::where('role', 'user')
-            ->where('is_active', 1)
+        $activeReader = User::where('role', 'reader')
+            ->where('is_active', true)
             ->count();
-
-        $blockedReader = User::where('role', 'user')
-            ->where('is_active', 0)
+        $blockedReader = User::where('role', 'reader')
+            ->where('is_active', false)
             ->count();
 
         return view('admin.reader.index', compact(
@@ -59,22 +51,20 @@ class ReaderController extends Controller
         ));
     }
 
-    /**
-     * Display the specified reader
-     */
     public function show($id)
     {
-        $reader = User::withCount('readingHistories')
+        $reader = User::where('role', 'reader')
+            ->withCount(['readingHistories', 'comments', 'ratings'])
             ->findOrFail($id);
 
         $readingHistories = $reader->readingHistories()
-            ->with(['novel', 'chapter'])
-            ->orderByDesc('id')
+            ->with(['chapter.novel'])
+            ->orderByDesc('last_read_at')
             ->limit(10)
             ->get();
 
         $comments = $reader->comments()
-            ->with('novel')
+            ->with(['chapter.novel'])
             ->latest()
             ->limit(10)
             ->get();
@@ -86,27 +76,22 @@ class ReaderController extends Controller
         ));
     }
 
-    /**
-     * Show edit form for reader
-     */
     public function edit($id)
     {
-        $reader = User::where('role', 'user')->findOrFail($id);
+        $reader = User::where('role', 'reader')->findOrFail($id);
+
         return view('admin.reader.edit', compact('reader'));
     }
 
-    /**
-     * Update reader information
-     */
     public function update(Request $request, $id)
     {
-        $reader = User::where('role', 'user')->findOrFail($id);
+        $reader = User::where('role', 'reader')->findOrFail($id);
 
         $validated = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,' . $id,
             'password'  => 'nullable|min:8|confirmed',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         try {
@@ -115,12 +100,11 @@ class ReaderController extends Controller
                 'email' => $validated['email'],
             ];
 
-            // Update password jika diisi
             if (! empty($validated['password'])) {
                 $updateData['password'] = Hash::make($validated['password']);
             }
 
-            if (isset($validated['is_active'])) {
+            if (array_key_exists('is_active', $validated)) {
                 $updateData['is_active'] = $validated['is_active'];
             }
 
@@ -129,32 +113,22 @@ class ReaderController extends Controller
             return redirect()
                 ->route('admin.reader.show', $id)
                 ->with('success', 'Data reader berhasil diperbarui.');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Approve reader to become author
-     */
     public function approve($id)
     {
         try {
             DB::beginTransaction();
 
-            $reader = User::findOrFail($id);
-
-            // Validasi bahwa user adalah reader dan ada request author
-            if ($reader->role !== 'user') {
-                return redirect()->back()->with('error', 'User bukan reader');
-            }
+            $reader = User::where('role', 'reader')->findOrFail($id);
 
             if ($reader->author_request !== 'pending') {
-                return redirect()->back()->with('error', 'Tidak ada pengajuan author yang pending');
+                return redirect()->back()->with('error', 'Tidak ada pengajuan author yang pending.');
             }
 
-            // Update role menjadi author
             $reader->update([
                 'role'               => 'author',
                 'author_request'     => 'approved',
@@ -164,33 +138,24 @@ class ReaderController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.reader.show', $id)
-                ->with('success', 'Reader berhasil disetujui menjadi Author! Statistik telah diperbarui.');
-
+                ->route('admin.reader.index')
+                ->with('success', 'Reader berhasil disetujui menjadi author.');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->back()->with('error', 'Gagal menyetujui: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Reject author request
-     */
     public function reject($id)
     {
         try {
-            $reader = User::findOrFail($id);
-
-            // Validasi
-            if ($reader->role !== 'user') {
-                return redirect()->back()->with('error', 'User bukan reader');
-            }
+            $reader = User::where('role', 'reader')->findOrFail($id);
 
             if ($reader->author_request !== 'pending') {
-                return redirect()->back()->with('error', 'Tidak ada pengajuan author yang pending');
+                return redirect()->back()->with('error', 'Tidak ada pengajuan author yang pending.');
             }
 
-            // Update status pengajuan
             $reader->update([
                 'author_request'     => 'rejected',
                 'author_rejected_at' => now(),
@@ -199,55 +164,40 @@ class ReaderController extends Controller
             return redirect()
                 ->route('admin.reader.show', $id)
                 ->with('success', 'Pengajuan author berhasil ditolak.');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menolak: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Block or unblock reader
-     */
     public function block($id)
     {
         try {
-            $reader = User::findOrFail($id);
+            $reader = User::where('role', 'reader')->findOrFail($id);
 
-            // Toggle status is_active
-            $newStatus = ! $reader->is_active;
-            $reader->update(['is_active' => $newStatus]);
+            $reader->update(['is_active' => ! $reader->is_active]);
 
-            $message = $newStatus
+            $message = $reader->is_active
                 ? 'Reader berhasil diaktifkan kembali.'
                 : 'Reader berhasil diblokir.';
 
             return redirect()
                 ->route('admin.reader.show', $id)
                 ->with('success', $message);
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal mengubah status: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Delete reader (soft delete)
-     */
     public function destroy($id)
     {
         try {
-            $reader = User::findOrFail($id);
-
-            if ($reader->role !== 'user') {
-                return redirect()->back()->with('error', 'Tidak dapat menghapus user yang bukan reader');
-            }
+            $reader = User::where('role', 'reader')->findOrFail($id);
 
             $reader->delete();
 
             return redirect()
                 ->route('admin.reader.index')
                 ->with('success', 'Reader berhasil dihapus.');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus: ' . $e->getMessage());
         }

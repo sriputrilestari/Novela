@@ -76,8 +76,8 @@
             <div class="card shadow mb-4">
                 <div class="card-body text-center pt-4 pb-3">
                     <div class="mb-3">
-                        @if($reader->profile_photo)
-                            <img src="{{ asset('storage/' . $reader->profile_photo) }}"
+                        @if($reader->photo)
+                            <img src="{{ asset('storage/' . $reader->photo) }}"
                                 class="rounded-circle"
                                 style="width:90px; height:90px; object-fit:cover; border: 3px solid #4e73df;">
                         @else
@@ -251,14 +251,14 @@
                             <tbody>
                         @endif
                                 <tr>
-                                    <td class="px-4 align-middle font-weight-bold text-gray-800">{{ $history->novel->judul ?? '-' }}</td>
+                                    <td class="px-4 align-middle font-weight-bold text-gray-800">{{ $history->chapter?->novel?->judul ?? '-' }}</td>
                                     <td class="align-middle text-muted small">
                                         <i class="fas fa-bookmark fa-fw mr-1 text-gray-400"></i>
-                                        Chapter {{ $history->chapter->nomor_chapter ?? '-' }}
+                                        {{ $history->chapter?->judul_chapter ?? '-' }}
                                     </td>
                                     <td class="align-middle text-muted small">
                                         <i class="fas fa-clock fa-fw mr-1 text-gray-400"></i>
-                                        {{ $history->created_at?->diffForHumans() ?? '-' }}
+                                        {{ $history->last_read_at?->diffForHumans() ?? '-' }}
                                     </td>
                                 </tr>
                         @if($loop->last)
@@ -301,8 +301,8 @@
                             <tbody>
                         @endif
                                 <tr>
-                                    <td class="px-4 align-middle font-weight-bold text-gray-800">{{ $comment->novel->judul ?? '-' }}</td>
-                                    <td class="align-middle text-muted small">{{ Str::limit($comment->content, 60) }}</td>
+                                    <td class="px-4 align-middle font-weight-bold text-gray-800">{{ $comment->chapter?->novel?->judul ?? '-' }}</td>
+                                    <td class="align-middle text-muted small">{{ \Illuminate\Support\Str::limit($comment->komentar, 60) }}</td>
                                     <td class="align-middle text-muted small">
                                         <i class="fas fa-calendar-alt fa-fw mr-1 text-gray-400"></i>
                                         {{ $comment->created_at?->format('d M Y') ?? '-' }}

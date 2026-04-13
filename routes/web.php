@@ -30,7 +30,7 @@ use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NovelController;
 use App\Http\Controllers\Reader\AuthorRequestController;
-use App\Http\Controllers\Reader\ProfileController as ReaderProfileController; // ✅ BARU
+use App\Http\Controllers\Reader\ProfileController as ReaderProfileController;
 use App\Http\Controllers\Reader\ReportController as ReaderReportController;
 use App\Http\Controllers\ReadingHistoryController;
 use Illuminate\Support\Facades\Route;

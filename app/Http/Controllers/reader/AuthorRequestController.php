@@ -1,8 +1,8 @@
 <?php
+
 namespace App\Http\Controllers\Reader;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,6 +11,7 @@ class AuthorRequestController extends Controller
     public function index()
     {
         $user = Auth::user();
+
         return view('pages.authorrequest', compact('user'))->with('currentUser', $user);
     }
 
@@ -19,7 +20,7 @@ class AuthorRequestController extends Controller
         $request->validate([
             'pen_name'         => 'required|string|max:255',
             'sinopsis_pertama' => 'required|string|min:50|max:500',
-            'pengalaman'       => 'nullable|string',
+            'pengalaman'       => 'nullable|string|max:255',
             'motivasi'         => 'nullable|string|max:1000',
             'setuju'           => 'accepted',
         ], [
@@ -31,28 +32,57 @@ class AuthorRequestController extends Controller
 
         $user = Auth::user();
 
-        // Cek apakah sudah punya request yang pending
-        if ($user->author_request && $user->author_request->status === 'pending') {
+        if ($user->author_request === 'pending') {
             return back()->with('error', 'Kamu sudah memiliki permintaan yang sedang ditinjau.');
         }
 
-        // Simpan request ke tabel reports (atau bisa buat tabel author_requests sendiri)
-        // Menggunakan field yang ada di model user (author_request)
-        // Untuk sementara update field author_request = 1 sebagai tanda sudah request
+        if ($user->role !== 'reader') {
+            return back()->with('error', 'Hanya reader yang bisa mengajukan permintaan author.');
+        }
+
+        $noteParts = [
+            'Nama pena: ' . $request->pen_name,
+            'Sinopsis: ' . $request->sinopsis_pertama,
+        ];
+
+        if ($request->filled('pengalaman')) {
+            $noteParts[] = 'Pengalaman: ' . $request->pengalaman;
+        }
+
+        if ($request->filled('motivasi')) {
+            $noteParts[] = 'Motivasi: ' . $request->motivasi;
+        }
+
+        if ($request->filled('genres')) {
+            $noteParts[] = 'Genre favorit: ' . implode(', ', (array) $request->genres);
+        }
+
         $user->update([
-            'author_request' => 1,
+            'author_request'      => 'pending',
+            'author_request_note' => implode("\n\n", $noteParts),
+            'author_request_date' => now(),
+            'author_approved_at'  => null,
+            'author_rejected_at'  => null,
         ]);
 
-        // Kirim notifikasi ke admin (opsional, bisa via event/notification)
-        // event(new AuthorRequested($user, $request->all()));
-
-        return back()->with('success', 'Permintaan berhasil dikirim! Tim kami akan meninjau dalam 1–3 hari kerja.');
+        return back()->with('success', 'Permintaan berhasil dikirim! Tim kami akan meninjau dalam 1-3 hari kerja.');
     }
 
     public function reapply(Request $request)
     {
         $user = Auth::user();
-        $user->update(['author_request' => 0]);
+
+        if ($user->author_request !== 'rejected') {
+            return redirect()->route('reader.author-request')
+                ->with('error', 'Pengajuan ulang hanya tersedia setelah permintaan ditolak.');
+        }
+
+        $user->update([
+            'author_request'      => 'none',
+            'author_request_note' => null,
+            'author_request_date' => null,
+            'author_rejected_at'  => null,
+        ]);
 
         return redirect()->route('reader.author-request')
             ->with('success', 'Kamu bisa mengisi form pengajuan ulang sekarang.');
@@ -61,7 +91,16 @@ class AuthorRequestController extends Controller
     public function cancel(Request $request)
     {
         $user = Auth::user();
-        $user->update(['author_request' => 0]);
+
+        if ($user->author_request !== 'pending') {
+            return back()->with('error', 'Tidak ada permintaan yang bisa dibatalkan.');
+        }
+
+        $user->update([
+            'author_request'      => 'none',
+            'author_request_note' => null,
+            'author_request_date' => null,
+        ]);
 
         return back()->with('success', 'Permintaan berhasil dibatalkan.');
     }

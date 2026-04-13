@@ -8,6 +8,7 @@ use App\Models\Genre;
 use App\Models\Novel;
 use App\Models\Rating;
 use App\Models\ReadingHistory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,26 +17,43 @@ class NovelController extends Controller
     // GET / (Home)
     public function home()
     {
-        $featured = Novel::where('approval_status', 'published')
+        $publishedQuery = Novel::query()
+            ->where('approval_status', 'published');
+
+        $featured = (clone $publishedQuery)
             ->orderByDesc('rating')
+            ->orderByDesc('total_rating')
+            ->orderByDesc('views')
             ->with(['author', 'genre'])
             ->withCount('chapters')
             ->first();
 
         // Novel Terbaru — urut dari yang terbaru dibuat (tampil kiri = grid auto-fill)
-        $latestNovels = Novel::where('approval_status', 'published')
+        $latestNovels = (clone $publishedQuery)
             ->orderByDesc('created_at')
             ->with(['author', 'genre'])
-            ->limit(12)
+            ->withCount('chapters')
+            ->limit(20)
             ->get();
 
         // Novel Populer — diambil dari views terbanyak
-        $popularNovels = Novel::where('approval_status', 'published')
-            ->orderByDesc('views')
+        $popularNovels = (clone $publishedQuery)
             ->with(['author', 'genre'])
             ->withCount('chapters')
-            ->limit(10)
+            ->orderByRaw('views DESC, rating DESC, total_rating DESC, created_at DESC')
+            ->limit(20)
             ->get();
+
+        $featuredNovels = (clone $publishedQuery)
+            ->with(['author', 'genre'])
+            ->withCount('chapters')
+            ->orderByDesc('rating')
+            ->orderByDesc('total_rating')
+            ->orderByDesc('views')
+            ->limit(20)
+            ->get()
+            ->when($featured, fn (Collection $items) => $items->reject(fn ($novel) => $novel->id === $featured->id))
+            ->values();
 
         // Stats user (jika login)
         $stats          = [];
@@ -65,6 +83,7 @@ class NovelController extends Controller
 
         return view('pages.home', compact(
             'featured',
+            'featuredNovels',
             'latestNovels',
             'popularNovels',
             'stats',

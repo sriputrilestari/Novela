@@ -2,53 +2,48 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 12px 16px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(4, 7, 26, 0.88);
+  background: rgba(4, 7, 26, 0.96);
   backdrop-filter: blur(22px);
 }
 
-.topbar-row,
-.topbar-search-row {
-  width: min(100%, 1180px);
+.topbar-shell {
+  width: min(100%, 1320px);
   margin: 0 auto;
-}
-
-.topbar-row {
+  padding: 14px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .topbar-logo {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: 'Cinzel', serif;
-  font-size: 1.2rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: var(--text-white);
+  flex-shrink: 0;
 }
 
 .logo-star {
-  color: var(--star);
+  color: rgb(70, 70, 255);
   font-size: 0.95rem;
-}
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.topbar-search-row {
-  margin-top: 12px;
 }
 
 .topbar-search-form,
 .search-wrap {
   position: relative;
+}
+
+.topbar-search-form {
+  order: initial;
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .search-icon {
@@ -72,8 +67,9 @@
 }
 
 .search-input {
-  padding: 12px 14px 12px 40px;
-  min-height: 46px;
+  padding: 9px 12px 9px 34px;
+  min-height: 40px;
+  font-size: 0.88rem;
 }
 
 .search-input:focus,
@@ -95,6 +91,13 @@
 
 .desktop-nav {
   display: none;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .avatar-btn,
@@ -152,8 +155,13 @@
 }
 
 .btn-auth-mobile {
-  min-height: 38px;
+  min-height: 42px;
   padding-inline: 14px;
+  font-size: 0.84rem;
+}
+
+.topbar-right .btn-auth-mobile {
+  min-width: 74px;
 }
 
 .btn-primary:hover,
@@ -169,13 +177,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .section-title {
   font-family: 'Cinzel', serif;
-  font-size: 1rem;
+  font-size: 1.02rem;
   color: var(--text-white);
+  letter-spacing: 0.01em;
 }
 
 .see-all {
@@ -187,6 +196,84 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.novel-section {
+  width: min(100%, 980px);
+  margin-inline: auto;
+  margin-bottom: 32px;
+  background: transparent;
+}
+
+.novel-slider {
+  display: grid;
+  gap: 14px;
+}
+
+.novel-slider-window {
+  overflow: hidden;
+}
+
+.novel-slider-track {
+  display: flex;
+  transition: transform 0.32s ease;
+  will-change: transform;
+}
+
+.novel-slide {
+  min-width: 100%;
+}
+
+.novel-grid-slider {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.novel-slider-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.slider-arrow,
+.slider-dot {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+}
+
+.slider-arrow {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+}
+
+.slider-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.slider-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.slider-dot {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.slider-dot.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
 }
 
 .novel-card,
@@ -204,17 +291,24 @@
 
 .novel-card {
   overflow: hidden;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  min-width: 0;
 }
 
 .novel-cover,
 .list-cover,
 .reading-cover {
-  background: linear-gradient(135deg, var(--bg-mid), var(--bg-card));
+  background: #1a2456;
 }
 
 .novel-cover {
   aspect-ratio: 2 / 3;
   overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.18);
 }
 
 .novel-cover img,
@@ -226,7 +320,7 @@
 }
 
 .novel-info {
-  padding: 12px;
+  padding: 10px 2px 0;
 }
 
 .novel-title,
@@ -238,8 +332,9 @@
 }
 
 .novel-title {
-  font-size: 0.92rem;
+  font-size: 0.96rem;
   line-height: 1.4;
+  min-height: 2.7em;
 }
 
 .novel-author,
@@ -249,6 +344,12 @@
   margin-top: 4px;
   color: var(--text-muted);
   font-size: 0.78rem;
+}
+
+.novel-author {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .novel-genre,
@@ -261,6 +362,24 @@
   background: rgba(79, 124, 255, 0.14);
   border: 1px solid rgba(79, 124, 255, 0.22);
   color: #c9d7ff;
+  font-size: 0.75rem;
+}
+
+.novel-meta-row {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.novel-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-soft);
   font-size: 0.75rem;
 }
 
@@ -299,6 +418,26 @@
   margin-left: 6px;
   color: var(--text-soft);
   font-size: 0.78rem;
+}
+
+.novel-card-footer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+.search-results-wrap {
+  width: min(100%, 980px);
+  background: transparent;
+}
+
+.search-pagination {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
 }
 
 .novel-list {
@@ -425,6 +564,10 @@
 
 .search-hero {
   background: linear-gradient(180deg, rgba(79, 124, 255, 0.12), transparent);
+  min-height: 318px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .search-hero-label,
@@ -445,6 +588,7 @@
 .search-big-wrap {
   position: relative;
   margin: 18px auto 0;
+  width: min(100%, 520px);
 }
 
 .search-big {
@@ -468,6 +612,7 @@
   overflow-x: auto;
   padding-bottom: 6px;
   margin-top: 16px;
+  justify-content: center;
 }
 
 .filter-chip,
@@ -614,51 +759,44 @@
   font-size: 0.85rem;
 }
 
-.mobile-bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 110;
+.reading-history-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-  background: rgba(4, 7, 26, 0.96);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
-}
-
-.mobile-nav-btn {
-  min-height: 44px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.mobile-nav-btn.active {
-  color: #fff;
-  background: linear-gradient(135deg, rgba(79, 124, 255, 0.2), rgba(123, 90, 240, 0.2));
+  gap: 12px;
 }
 
 @media (min-width: 768px) {
   .topbar {
-    padding-inline: 24px;
+    padding-inline: 0;
   }
 
   .topbar-logo {
     font-size: 1.4rem;
   }
 
-  .topbar-search-row {
-    margin-top: 14px;
+  .topbar-shell {
+    padding: 16px 18px;
+    gap: 12px;
+  }
+
+  .topbar-right {
+    gap: 10px;
+  }
+
+  .topbar-right .btn-auth-mobile {
+    min-width: 94px;
   }
 
   .novel-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .novel-grid-slider {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .novel-section,
+  .search-results-wrap {
+    width: min(100%, 1040px);
   }
 
   .toast {
@@ -670,29 +808,18 @@
 }
 
 @media (min-width: 1024px) {
-  .topbar {
-    padding: 16px 32px;
-  }
-
-  .topbar-row,
-  .topbar-search-row {
-    width: min(100%, 1180px);
-  }
-
-  .topbar-row {
-    gap: 20px;
-  }
-
-  .topbar-search-row {
-    display: none;
+  .topbar-search-form {
+    order: initial;
+    width: min(100%, 250px);
+    flex: 0 1 250px;
   }
 
   .desktop-nav {
-    width: min(100%, 1180px);
-    margin: 14px auto 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .nav-btn {
@@ -707,20 +834,23 @@
     background: rgba(79, 124, 255, 0.18);
   }
 
-  .topbar-row .search-wrap {
-    width: min(100%, 420px);
-  }
-
-  .topbar-row {
-    justify-content: space-between;
-  }
-
-  .mobile-bottom-nav {
-    display: none;
+  .topbar-shell {
+    flex-wrap: nowrap;
+    gap: 24px;
+    padding: 16px 30px;
   }
 
   .novel-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .novel-grid-slider {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .novel-section,
+  .search-results-wrap {
+    width: min(100%, 1120px);
   }
 
   .stats-strip {
