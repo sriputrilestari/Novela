@@ -82,7 +82,7 @@
         <div class="tabs-row">
             <button class="tab-btn active" onclick="switchTab(this,'tab-synopsis')">Sinopsis</button>
             <button class="tab-btn" onclick="switchTab(this,'tab-chapters')">Chapter</button>
-            <button class="tab-btn" onclick="switchTab(this,'tab-comments')">Komentar</button>
+            <!-- <button class="tab-btn" onclick="switchTab(this,'tab-comments')">Komentar</button> -->
             @auth
                 <button class="tab-btn" onclick="switchTab(this,'tab-rating')">Beri Rating</button>
             @endauth

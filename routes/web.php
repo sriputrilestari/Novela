@@ -197,4 +197,7 @@ Route::middleware(['auth', 'role:reader'])
         Route::get('profile', [ReaderProfileController::class, 'index'])->name('profile.index');
         Route::post('profile/update', [ReaderProfileController::class, 'update'])->name('profile.update');
         Route::post('profile/password', [ReaderProfileController::class, 'updatePassword'])->name('profile.password');
+
+        Route::get('/author-request', [AuthorRequestController::class, 'index'])
+            ->name('reader.author-request');
     });

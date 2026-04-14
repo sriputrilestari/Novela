@@ -4,35 +4,48 @@
 @php
     $latestSlides = $latestNovels->chunk(5);
     $popularSlides = $popularNovels->chunk(5);
-    $featuredSlides = $featuredNovels->chunk(5);
+
+    $sections = [
+        [
+            'id' => 'latest',
+            'title' => 'Novel Terbaru',
+            'slides' => $latestSlides,
+            'route' => route('search'),
+            'showViews' => false,
+        ],
+        [
+            'id' => 'popular',
+            'title' => 'Novel Populer',
+            'slides' => $popularSlides,
+            'route' => route('search', ['sort' => 'popular']),
+            'showViews' => true,
+        ],
+    ];
 @endphp
 
 @section('content')
-    @if (!$hasPublished)
-        <div class="content-wrap content-wrap-home" style="padding-bottom:0;">
-            <div class="alert alert-warning" style="margin-bottom:20px;">
-                Belum ada novel berstatus <strong>published</strong>. Menampilkan semua data sementara.
-            </div>
-        </div>
-    @endif
 
+    {{-- ─── HERO ─────────────────────────────────────────────────── --}}
     @if ($featured)
         <section class="hero-home-shell">
             <div class="hero-banner hero-banner-home">
                 <div class="hero-copy-home">
-                    <div class="hero-badge">Novel Pilihan</div>
+                    <div class="hero-badge">Novel Terpopuler</div>
                     <div class="hero-title">{{ $featured->judul }}</div>
                     <div class="hero-author">oleh <strong>{{ $featured->author->name }}</strong></div>
-                    <div class="hero-desc">{{ \Illuminate\Support\Str::limit($featured->sinopsis, 180) }}</div>
+                    <div class="hero-desc">
+                        {{ \Illuminate\Support\Str::limit($featured->sinopsis, 180) }}
+                    </div>
 
                     <div class="hero-meta">
                         <span class="hero-stars">
                             @for ($i = 1; $i <= 5; $i++)
-                                <span class="{{ $i <= round($featured->rating) ? 's-on' : 's-off' }}">*</span>
+                                <span class="{{ $i <= round($featured->rating) ? 'star-filled' : 'star-empty' }}">★</span>
                             @endfor
                         </span>
-                        <span class="hero-rating">{{ number_format($featured->rating, 1) }}
-                            ({{ $featured->total_rating }})</span>
+                        <span class="hero-rating">
+                            {{ number_format($featured->rating, 1) }} ({{ $featured->total_rating }})
+                        </span>
                         <span class="hero-tag">{{ $featured->genre->nama_genre }}</span>
                         <span class="hero-tag">{{ ucfirst($featured->status) }}</span>
                         <span class="hero-chapter">{{ $featured->chapters_count }} Chapter</span>
@@ -55,64 +68,14 @@
         </section>
     @endif
 
+    {{-- ─── MAIN CONTENT ────────────────────────────────────────── --}}
     <div class="content-wrap content-wrap-home">
-        @auth
-            @if ($readingHistory->isNotEmpty())
-                <div class="section-header">
-                    <div class="section-title">Lanjutkan Membaca</div>
-                    <a class="see-all" href="{{ route('history') }}">Lihat Semua -></a>
-                </div>
 
-                <div class="reading-history-strip mb-32">
-                    @foreach ($readingHistory as $history)
-                        <a href="{{ route('chapter.show', $history->chapter->id) }}" class="reading-item">
-                            <div class="reading-cover">
-                                @if ($history->chapter->novel->cover)
-                                    <img src="{{ asset('storage/' . ltrim($history->chapter->novel->cover, '/')) }}"
-                                        alt="{{ $history->chapter->novel->judul }}" />
-                                @else
-                                    <div class="hero-cover-placeholder">Cover</div>
-                                @endif
-                            </div>
-                            <div class="reading-info">
-                                <div class="reading-title">{{ $history->chapter->novel->judul }}</div>
-                                <div class="reading-author">{{ $history->chapter->judul_chapter }} -
-                                    {{ $history->chapter->novel->genre->nama_genre }}</div>
-                            </div>
-                            <div class="reading-right">
-                                <span class="text-xs text-muted">{{ $history->last_read_at?->diffForHumans() }}</span>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            @endif
-        @endauth
-
-        @php
-            $sections = [
-                [
-                    'id' => 'latest',
-                    'title' => 'Novel Terbaru',
-                    'slides' => $latestSlides,
-                    'route' => route('search'),
-                    'showViews' => false,
-                ],
-                [
-                    'id' => 'featured',
-                    'title' => 'Novel Pilihan',
-                    'slides' => $featuredSlides,
-                    'route' => route('search'),
-                    'showViews' => false,
-                ],
-                [
-                    'id' => 'popular',
-                    'title' => 'Novel Populer',
-                    'slides' => $popularSlides,
-                    'route' => route('search', ['sort' => 'popular']),
-                    'showViews' => true,
-                ],
-            ];
-        @endphp
+        @if (!$hasPublished)
+            <div class="alert alert-warning" style="margin-bottom:20px;">
+                Belum ada novel berstatus <strong>published</strong>. Menampilkan semua data sementara.
+            </div>
+        @endif
 
         @foreach ($sections as $section)
             @if ($section['slides']->isEmpty())
@@ -122,7 +85,7 @@
             <section class="novel-section novel-section-{{ $section['id'] }}">
                 <div class="section-header">
                     <div class="section-title">{{ $section['title'] }}</div>
-                    <a class="see-all" href="{{ $section['route'] }}">Lihat Semua -></a>
+                    <a class="see-all" href="{{ $section['route'] }}">Lihat Semua →</a>
                 </div>
 
                 <div class="novel-slider" data-slider-root id="slider-{{ $section['id'] }}">
@@ -132,30 +95,41 @@
                                 <div class="novel-slide" data-slide>
                                     <div class="novel-grid novel-grid-slider">
                                         @foreach ($slide as $novel)
-                                            <a href="{{ route('novel.show', $novel->id) }}" class="novel-card">
-                                                <div class="novel-cover">
-                                                    @if ($novel->cover)
-                                                        <img src="{{ asset('storage/' . ltrim($novel->cover, '/')) }}"
-                                                            alt="{{ $novel->judul }}" />
-                                                    @else
-                                                        <div class="hero-cover-placeholder">Cover</div>
-                                                    @endif
-                                                    <div class="novel-cover-overlay"></div>
-                                                </div>
+                                            <div class="novel-card" data-novel-id="{{ $novel->id }}">
+
+                                                <a href="{{ route('novel.show', $novel->id) }}" class="novel-cover-link">
+                                                    <div class="novel-cover">
+                                                        @if ($novel->cover)
+                                                            <img src="{{ asset('storage/' . ltrim($novel->cover, '/')) }}"
+                                                                alt="{{ $novel->judul }}" loading="lazy" />
+                                                        @else
+                                                            <div class="hero-cover-placeholder">Cover</div>
+                                                        @endif
+                                                        <div class="novel-cover-overlay"></div>
+                                                    </div>
+                                                </a>
+
                                                 <div class="novel-info">
-                                                    <div class="novel-title">{{ $novel->judul }}</div>
+                                                    <a href="{{ route('novel.show', $novel->id) }}"
+                                                        class="novel-title-link">
+                                                        <div class="novel-title">{{ $novel->judul }}</div>
+                                                    </a>
                                                     <div class="novel-author">{{ $novel->author->name }}</div>
+
                                                     <div class="novel-meta-row">
                                                         <span class="novel-genre">{{ $novel->genre->nama_genre }}</span>
                                                         <span class="novel-status">{{ ucfirst($novel->status) }}</span>
                                                     </div>
+
                                                     <div class="novel-stars">
                                                         @for ($i = 1; $i <= 5; $i++)
                                                             <span
-                                                                class="{{ $i <= round($novel->rating) ? 'star-filled' : 'star-empty' }}">*</span>
+                                                                class="novel-star {{ $i <= round($novel->rating) ? 'star-filled' : 'star-empty' }}">★</span>
                                                         @endfor
-                                                        <span>{{ number_format($novel->rating, 1) }}</span>
+                                                        <span
+                                                            class="novel-rating-val">{{ number_format($novel->rating, 1) }}</span>
                                                     </div>
+
                                                     <div class="novel-card-footer">
                                                         <span>{{ $novel->chapters_count ?? 0 }} chapter</span>
                                                         @if ($section['showViews'])
@@ -164,8 +138,46 @@
                                                             <span>{{ $novel->total_rating }} rating</span>
                                                         @endif
                                                     </div>
+
+                                                    @php
+                                                        $userRating = auth()->check()
+                                                            ? auth()
+                                                                    ->user()
+                                                                    ->ratings()
+                                                                    ->where('novel_id', $novel->id)
+                                                                    ->value('rating') ?? 0
+                                                            : 0;
+                                                    @endphp
+                                                    <button type="button" class="btn-rate-novel" data-rate-novel
+                                                        data-novel-id="{{ $novel->id }}"
+                                                        data-novel-title="{{ $novel->judul }}"
+                                                        data-novel-author="{{ $novel->author->name }}"
+                                                        data-cover-url="{{ $novel->cover ? asset('storage/' . ltrim($novel->cover, '/')) : '' }}"
+                                                        data-user-rating="{{ $userRating }}"
+                                                        aria-label="Beri rating untuk {{ $novel->judul }}"
+                                                        style="
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: center;
+                                                            gap: 5px;
+                                                            width: 100%;
+                                                            margin-top: 8px;
+                                                            padding: 6px 0;
+                                                            border-radius: 6px;
+                                                            font-size: 11px;
+                                                            font-weight: 500;
+                                                            cursor: pointer;
+                                                            transition: background .15s, border-color .15s, color .15s;
+                                                            {{ $userRating
+                                                                ? 'background:#FEF3C7; color:#92400E; border:0.5px solid #FCD34D;'
+                                                                : 'background:transparent; color:var(--text-muted,#888); border:0.5px solid #ddd;' }}
+                                                        ">
+                                                        <span
+                                                            style="font-size:12px; line-height:1;">{{ $userRating ? '★' : '☆' }}</span>
+                                                        {{ $userRating ? 'Rating kamu: ' . $userRating : 'Beri Rating' }}
+                                                    </button>
                                                 </div>
-                                            </a>
+                                            </div>
                                         @endforeach
                                     </div>
                                 </div>
@@ -175,27 +187,111 @@
 
                     @if ($section['slides']->count() > 1)
                         <div class="novel-slider-controls">
-                            <button type="button" class="slider-arrow" data-prev aria-label="Slide sebelumnya"><-< /button>
-                                    <div class="slider-dots">
-                                        @foreach ($section['slides'] as $slideIndex => $unused)
-                                            <button type="button"
-                                                class="slider-dot {{ $slideIndex === 0 ? 'active' : '' }}" data-dot
-                                                aria-label="Slide {{ $slideIndex + 1 }}">{{ $slideIndex + 1 }}</button>
-                                        @endforeach
-                                    </div>
-                                    <button type="button" class="slider-arrow" data-next
-                                        aria-label="Slide berikutnya">-></button>
+                            <button type="button" class="slider-arrow" data-prev aria-label="Slide sebelumnya">←</button>
+                            <div class="slider-dots">
+                                @foreach ($section['slides'] as $slideIndex => $unused)
+                                    <button type="button" class="slider-dot {{ $slideIndex === 0 ? 'active' : '' }}"
+                                        data-dot aria-label="Slide {{ $slideIndex + 1 }}"></button>
+                                @endforeach
+                            </div>
+                            <button type="button" class="slider-arrow" data-next aria-label="Slide berikutnya">→</button>
                         </div>
                     @endif
                 </div>
             </section>
         @endforeach
+
     </div>
+
+    {{-- ─── RATING MODAL ────────────────────────────────────────── --}}
+    <div id="ratingModalOverlay"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; align-items:center; justify-content:center;"
+        aria-hidden="true">
+
+        <div role="dialog" aria-modal="true" aria-labelledby="ratingModalTitle"
+            style="background:var(--bg-card,#fff); border-radius:12px; border:0.5px solid rgba(0,0,0,.1); padding:1.5rem; width:320px; max-width:90vw; position:relative;">
+
+            <button id="ratingModalClose"
+                style="position:absolute; top:12px; right:14px; background:none; border:none; font-size:20px; cursor:pointer; color:inherit; line-height:1;"
+                aria-label="Tutup">&times;</button>
+
+            {{-- Form state --}}
+            <div id="ratingFormState">
+                <div style="display:flex; gap:12px; align-items:center; margin-bottom:16px;">
+                    <div id="ratingModalCover"
+                        style="width:52px; height:72px; border-radius:6px; background:#eee; flex-shrink:0; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:9px; color:#999;">
+                    </div>
+                    <div>
+                        <div style="font-size:11px; color:#888; margin-bottom:2px;">Beri Rating</div>
+                        <div id="ratingModalTitle" style="font-size:14px; font-weight:500; line-height:1.3;"></div>
+                        <div id="ratingModalAuthor" style="font-size:12px; color:#888; margin-top:2px;"></div>
+                    </div>
+                </div>
+
+                <div id="starPicker" style="display:flex; gap:6px; justify-content:center; margin-bottom:8px;"
+                    role="group" aria-label="Pilih rating bintang">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <button type="button" class="star-btn" data-value="{{ $i }}"
+                            style="font-size:28px; background:none; border:none; cursor:pointer; color:#ddd; padding:0; line-height:1; transition:color .1s, transform .1s;"
+                            aria-label="{{ $i }} bintang">★</button>
+                    @endfor
+                </div>
+
+                <div id="starLabel"
+                    style="text-align:center; font-size:12px; color:#888; margin-bottom:16px; min-height:18px;">
+                    Pilih bintang…
+                </div>
+
+                <form id="ratingForm" method="POST">
+                    @csrf
+                    <input type="hidden" name="rating" id="ratingInput" value="">
+
+                    {{-- Info 1x rating --}}
+                    <div id="ratingInfoOnce"
+                        style="display:flex; align-items:center; gap:6px; background:#FFF8E1; border:0.5px solid #FFD54F; border-radius:7px; padding:8px 10px; margin-bottom:12px;">
+                        <span style="font-size:14px; line-height:1;">⚠</span>
+                        <span style="font-size:11px; color:#7B5E00; line-height:1.4;">
+                            Rating hanya bisa dikirim <strong>1 kali</strong>.
+                            Pastikan pilihanmu sudah tepat sebelum submit.
+                        </span>
+                    </div>
+
+                    <div style="display:flex; gap:8px; justify-content:flex-end;">
+                        <button type="button" id="ratingCancelBtn"
+                            style="font-size:13px; padding:7px 14px; border-radius:8px; background:transparent; border:0.5px solid #ccc; cursor:pointer;">
+                            Batal
+                        </button>
+                        <button type="submit" id="ratingSubmitBtn" disabled
+                            style="font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; background:#111; color:#fff; border:none; cursor:pointer; opacity:.4;">
+                            Kirim Rating
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Sukses state --}}
+            <div id="ratingSuccessState" style="display:none; text-align:center; padding:1rem 0;">
+                <div id="ratingSuccessStars" style="font-size:28px; margin-bottom:8px; line-height:1;"></div>
+                <div id="ratingSuccessLabel" style="font-size:15px; font-weight:500; margin-bottom:6px;"></div>
+                <div id="ratingSuccessSub" style="font-size:12px; color:#888;"></div>
+                <button type="button" id="ratingDoneBtn"
+                    style="margin-top:16px; font-size:13px; font-weight:500; padding:8px 20px; border-radius:8px; background:#111; color:#fff; border:none; cursor:pointer;">
+                    Tutup
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            /* ──────────────────────────────────────────────────
+               SLIDER
+            ────────────────────────────────────────────────── */
             document.querySelectorAll('[data-slider-root]').forEach(function(root) {
                 const track = root.querySelector('[data-slider-track]');
                 const slides = Array.from(root.querySelectorAll('[data-slide]'));
@@ -216,21 +312,174 @@
                     index = Math.max(0, index - 1);
                     render();
                 });
-
                 next?.addEventListener('click', () => {
                     index = Math.min(slides.length - 1, index + 1);
                     render();
                 });
-
-                dots.forEach((dot, i) => {
-                    dot.addEventListener('click', () => {
-                        index = i;
-                        render();
-                    });
-                });
-
+                dots.forEach((dot, i) => dot.addEventListener('click', () => {
+                    index = i;
+                    render();
+                }));
                 render();
             });
+
+            /* ──────────────────────────────────────────────────
+               RATING MODAL
+            ────────────────────────────────────────────────── */
+            const starLabels = ['', 'Sangat Buruk', 'Kurang Baik', 'Cukup', 'Bagus', 'Sangat Bagus'];
+            const overlay = document.getElementById('ratingModalOverlay');
+            const formState = document.getElementById('ratingFormState');
+            const successState = document.getElementById('ratingSuccessState');
+            const starBtns = Array.from(document.querySelectorAll('.star-btn'));
+            const starLabel = document.getElementById('starLabel');
+            const ratingInput = document.getElementById('ratingInput');
+            const submitBtn = document.getElementById('ratingSubmitBtn');
+            const ratingForm = document.getElementById('ratingForm');
+            let picked = 0;
+
+            function renderStars(val) {
+                starBtns.forEach((btn, i) => {
+                    btn.style.color = i < val ? '#F59E0B' : '#ddd';
+                    btn.style.transform = i < val ? 'scale(1.1)' : 'scale(1)';
+                });
+                starLabel.textContent = val ? starLabels[val] : 'Pilih bintang…';
+            }
+
+            function openModal(novelId, novelTitle, novelAuthor, coverUrl, existingRating) {
+                picked = existingRating || 0;
+                ratingInput.value = picked || '';
+                submitBtn.disabled = !picked;
+                submitBtn.style.opacity = picked ? '1' : '.4';
+                formState.style.display = '';
+                successState.style.display = 'none';
+                submitBtn.textContent = 'Kirim Rating';
+
+                document.getElementById('ratingModalTitle').textContent = novelTitle;
+                document.getElementById('ratingModalAuthor').textContent = novelAuthor;
+
+                const coverEl = document.getElementById('ratingModalCover');
+                coverEl.innerHTML = coverUrl ?
+                    `<img src="${coverUrl}" alt="${novelTitle}" style="width:100%;height:100%;object-fit:cover;">` :
+                    'Cover';
+
+                ratingForm.action = '{{ url('/novel') }}/' + novelId + '/rate';
+                renderStars(picked);
+
+                // Sembunyikan info 1x kalau user sudah pernah rating
+                const infoOnce = document.getElementById('ratingInfoOnce');
+                if (infoOnce) infoOnce.style.display = picked ? 'none' : 'flex';
+
+                overlay.style.display = 'flex';
+                overlay.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeModal() {
+                overlay.style.display = 'none';
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+
+            // Hover & klik bintang
+            starBtns.forEach((btn, i) => {
+                btn.addEventListener('mouseover', () => renderStars(i + 1));
+                btn.addEventListener('mouseout', () => renderStars(picked));
+                btn.addEventListener('click', () => {
+                    picked = i + 1;
+                    ratingInput.value = picked;
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    renderStars(picked);
+                });
+            });
+
+            // Submit via AJAX
+            ratingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!picked) return;
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Mengirim…';
+
+                fetch(ratingForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: new FormData(ratingForm),
+                    })
+                    .then(res => {
+                        if (res.status === 401) {
+                            window.location.href = '{{ route('login') }}';
+                            return null;
+                        }
+                        if (!res.ok) throw new Error('Gagal');
+                        return res.json().catch(() => ({}));
+                    })
+                    .then(data => {
+                        if (!data) return;
+
+                        // Update bintang & nilai di card tanpa reload
+                        if (data.rating !== undefined) {
+                            document.querySelectorAll(`.novel-card[data-novel-id="${data.novel_id}"]`)
+                                .forEach(card => {
+                                    const ratingEl = card.querySelector('.novel-rating-val');
+                                    if (ratingEl) ratingEl.textContent = parseFloat(data.rating)
+                                        .toFixed(1);
+                                    card.querySelectorAll('.novel-star').forEach((s, i) => {
+                                        s.className = 'novel-star ' + (i < Math.round(data
+                                            .rating) ? 'star-filled' : 'star-empty');
+                                    });
+                                });
+                        }
+
+                        // Tampilkan state sukses
+                        formState.style.display = 'none';
+                        successState.style.display = '';
+
+                        document.getElementById('ratingSuccessStars').innerHTML = [1, 2, 3, 4, 5].map(
+                            i =>
+                            `<span style="color:${i <= picked ? '#F59E0B' : '#ddd'}">★</span>`
+                        ).join('');
+                        document.getElementById('ratingSuccessLabel').textContent = starLabels[picked] +
+                            '!';
+                        document.getElementById('ratingSuccessSub').textContent =
+                            data.message || 'Rating kamu sudah tersimpan.';
+                    })
+                    .catch(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Kirim Rating';
+                        alert('Terjadi kesalahan. Silakan coba lagi.');
+                    });
+            });
+
+            // Tutup modal
+            document.getElementById('ratingModalClose').addEventListener('click', closeModal);
+            document.getElementById('ratingCancelBtn').addEventListener('click', closeModal);
+            document.getElementById('ratingDoneBtn').addEventListener('click', closeModal);
+            overlay.addEventListener('click', e => {
+                if (e.target === overlay) closeModal();
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            // Delegasi klik tombol rating di card
+            document.addEventListener('click', function(e) {
+                    const btn = e.target.closest('[data-rate-novel]');
+                    if (!btn) return;
+
+                    @auth
+                    openModal(
+                        btn.dataset.novelId,
+                        btn.dataset.novelTitle,
+                        btn.dataset.novelAuthor,
+                        btn.dataset.coverUrl || '',
+                        parseInt(btn.dataset.userRating) || 0
+                    );
+                @else
+                    window.location.href = '{{ route('login') }}';
+                @endauth
+            });
+
         });
     </script>
 @endpush

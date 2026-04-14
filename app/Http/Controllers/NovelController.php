@@ -20,7 +20,7 @@ class NovelController extends Controller
         $publishedQuery = Novel::query()
             ->where('approval_status', 'published');
         $hasPublished = (clone $publishedQuery)->exists();
-        $baseQuery = $hasPublished ? $publishedQuery : Novel::query();
+        $baseQuery    = $hasPublished ? $publishedQuery : Novel::query();
 
         $featured = (clone $baseQuery)
             ->orderByDesc('rating')
@@ -54,7 +54,7 @@ class NovelController extends Controller
             ->orderByDesc('views')
             ->limit(20)
             ->get()
-            ->when($featured, fn (Collection $items) => $items->reject(fn ($novel) => $novel->id === $featured->id))
+            ->when($featured, fn(Collection $items) => $items->reject(fn($novel) => $novel->id === $featured->id))
             ->values();
 
         // Stats user (jika login)
@@ -118,8 +118,8 @@ class NovelController extends Controller
 
         $userRating = Auth::check()
             ? Rating::where('user_id', Auth::id())
-                ->where('novel_id', $id)
-                ->value('rating')
+            ->where('novel_id', $id)
+            ->value('rating')
             : null;
 
         // Last read chapter for this user
@@ -245,7 +245,10 @@ class NovelController extends Controller
     public function rate(Request $request, $id)
     {
         if (! Auth::check()) {
-            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu untuk memberi rating.');
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Unauthenticated'], 401);
+            }
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
         $request->validate([
@@ -254,18 +257,11 @@ class NovelController extends Controller
 
         $novel = Novel::where('approval_status', 'published')->findOrFail($id);
 
-        // simpan / update rating user
         Rating::updateOrCreate(
-            [
-                'user_id'  => Auth::id(),
-                'novel_id' => $id,
-            ],
-            [
-                'rating' => $request->rating,
-            ]
+            ['user_id' => Auth::id(), 'novel_id' => $id],
+            ['rating' => $request->rating]
         );
 
-        // hitung ulang rata-rata
         $avg   = Rating::where('novel_id', $id)->avg('rating');
         $count = Rating::where('novel_id', $id)->count();
 
@@ -273,6 +269,16 @@ class NovelController extends Controller
             'rating'       => round($avg, 2),
             'total_rating' => $count,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Rating berhasil dikirim!',
+                'novel_id' => $novel->id,
+                'rating'   => round($avg, 2),
+                'total'    => $count,
+            ]);
+        }
 
         return back()->with('success', 'Rating berhasil dikirim!');
     }

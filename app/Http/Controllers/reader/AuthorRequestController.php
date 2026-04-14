@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\Reader;
 
 use App\Http\Controllers\Controller;
+use App\Models\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,7 +12,13 @@ class AuthorRequestController extends Controller
     {
         $user = Auth::user();
 
-        return view('pages.authorrequest', compact('user'))->with('currentUser', $user);
+        // ✅ ambil genre
+        $genres = Genre::orderBy('nama_genre')->get();
+
+        return view('pages.authorrequest', [
+            'currentUser' => $user,
+            'genres'      => $genres,
+        ]);
     }
 
     public function submit(Request $request)

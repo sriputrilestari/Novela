@@ -617,20 +617,21 @@
 
 .filter-chip,
 .genre-pill {
-  min-height: 38px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-soft);
-  white-space: nowrap;
+  display: inline-block;
+  padding: .3rem .85rem;
+  border-radius: 99px;
+  border: 0.5px solid var(--line);
+  font-size: .775rem;
+  cursor: pointer;
+  color: var(--ink-2);
+  background: var(--white);
+  transition: all .15s;
+  user-select: none;
 }
-
-.filter-chip.active,
 .genre-pill.active {
+  background: var(--blue);
   color: #fff;
-  border-color: rgba(79, 124, 255, 0.4);
-  background: rgba(79, 124, 255, 0.16);
+  border-color: var(--blue);
 }
 
 .stats-strip {
