@@ -36,7 +36,7 @@
                     <div class="card-body text-center pt-4 pb-3">
                         <div class="avatar-circle mx-auto mb-3 text-white d-flex align-items-center justify-content-center font-weight-bold"
                             style="width:80px; height:80px; border-radius:50%; font-size:32px;
-                            background-color: {{ ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b'][crc32($author->name) % 5] }};">
+                            background-color: {{ ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'][crc32($author->name) % 5] }};">
                             {{ strtoupper(substr($author->name, 0, 1)) }}
                         </div>
                         <h5 class="font-weight-bold text-gray-800 mb-1">{{ $author->name }}</h5>
@@ -101,8 +101,10 @@
                     <div class="card-body p-0">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
-                                <span class="text-muted small"><i class="fas fa-calendar-plus fa-fw mr-2"></i>Bergabung</span>
-                                <span class="small font-weight-bold">{{ $author->created_at?->format('d M Y') ?? '-' }}</span>
+                                <span class="text-muted small"><i
+                                        class="fas fa-calendar-plus fa-fw mr-2"></i>Bergabung</span>
+                                <span
+                                    class="small font-weight-bold">{{ $author->created_at?->format('d M Y') ?? '-' }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
                                 <span class="text-muted small"><i class="fas fa-clock fa-fw mr-2"></i>Login Terakhir</span>
@@ -134,7 +136,8 @@
                         <form action="{{ route('admin.author.toggle', $author->id) }}" method="POST" class="mb-2"
                             onsubmit="return confirm('{{ $author->is_active ? 'Nonaktifkan' : 'Aktifkan' }} akun author ini?')">
                             @csrf
-                            <button type="submit" class="btn btn-block btn-sm {{ $author->is_active ? 'btn-warning' : 'btn-success' }}">
+                            <button type="submit"
+                                class="btn btn-block btn-sm {{ $author->is_active ? 'btn-warning' : 'btn-success' }}">
                                 <i class="fas fa-{{ $author->is_active ? 'times-circle' : 'check-circle' }} mr-2"></i>
                                 {{ $author->is_active ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}
                             </button>
@@ -212,11 +215,20 @@
                                 <table class="table table-hover mb-0">
                                     <thead style="background-color: #f8f9fc;">
                                         <tr>
-                                            <th class="border-0 px-4 py-3 text-xs font-weight-bold text-uppercase text-gray-600" style="width: 40px;">#</th>
-                                            <th class="border-0 py-3 text-xs font-weight-bold text-uppercase text-gray-600">Judul Novel</th>
-                                            <th class="border-0 py-3 text-center text-xs font-weight-bold text-uppercase text-gray-600">Status</th>
-                                            <th class="border-0 py-3 text-center text-xs font-weight-bold text-uppercase text-gray-600">Views</th>
-                                            <th class="border-0 py-3 text-center text-xs font-weight-bold text-uppercase text-gray-600">Aksi</th>
+                                            <th class="border-0 px-4 py-3 text-xs font-weight-bold text-uppercase text-gray-600"
+                                                style="width: 40px;">#</th>
+                                            <th
+                                                class="border-0 py-3 text-xs font-weight-bold text-uppercase text-gray-600">
+                                                Judul Novel</th>
+                                            <th
+                                                class="border-0 py-3 text-center text-xs font-weight-bold text-uppercase text-gray-600">
+                                                Status</th>
+                                            <th
+                                                class="border-0 py-3 text-center text-xs font-weight-bold text-uppercase text-gray-600">
+                                                Views</th>
+                                            <th
+                                                class="border-0 py-3 text-center text-xs font-weight-bold text-uppercase text-gray-600">
+                                                Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -227,41 +239,45 @@
                                                     <div class="font-weight-bold text-gray-800">{{ $novel->judul }}</div>
                                                     @if ($novel->created_at)
                                                         <div class="small text-muted">
-                                                            <i class="fas fa-calendar-alt fa-fw mr-1"></i>{{ $novel->created_at->format('d M Y') }}
+                                                            <i
+                                                                class="fas fa-calendar-alt fa-fw mr-1"></i>{{ $novel->created_at->format('d M Y') }}
                                                         </div>
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     @php
                                                         $status = $novel->approval_status;
-                                                        $badgeClass = match($status) {
+                                                        $badgeClass = match ($status) {
                                                             'approved' => 'badge-success',
-                                                            'pending'  => 'badge-warning',
+                                                            'pending' => 'badge-warning',
                                                             'rejected' => 'badge-danger',
-                                                            default    => 'badge-secondary',
+                                                            default => 'badge-secondary',
                                                         };
-                                                        $icon = match($status) {
+                                                        $icon = match ($status) {
                                                             'approved' => 'check-circle',
-                                                            'pending'  => 'clock',
+                                                            'pending' => 'clock',
                                                             'rejected' => 'times-circle',
-                                                            default    => 'question-circle',
+                                                            default => 'question-circle',
                                                         };
                                                     @endphp
                                                     <span class="badge badge-pill {{ $badgeClass }} px-3 py-2">
-                                                        <i class="fas fa-{{ $icon }} mr-1"></i>{{ ucfirst($status) }}
+                                                        <i
+                                                            class="fas fa-{{ $icon }} mr-1"></i>{{ ucfirst($status) }}
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <span class="text-gray-700 font-weight-bold">
-                                                        <i class="fas fa-eye fa-fw text-gray-400 mr-1"></i>{{ number_format($novel->views) }}
+                                                        <i
+                                                            class="fas fa-eye fa-fw text-gray-400 mr-1"></i>{{ number_format($novel->views) }}
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     @if (Route::has('admin.novels.show'))
-                                                        <a href="{{ route('admin.novels.show', $novel->id) }}"
-                                                            class="btn btn-sm btn-outline-primary" title="Lihat Novel"
-                                                            style="width:32px; height:32px; padding:0; line-height:30px;">
-                                                            <i class="fas fa-eye"></i>
+                                                         <a href = "{{ route('admin.novels.show', $novel->id) }}";
+                                                            class     = "btn btn-sm btn-info"title="Detail Novel" ;
+                                                            style     = "width:32px; height:32px; padding:0; line-height:32px;">
+                                                            <i class  = "fas fa-eye">
+                                                            </i>
                                                         </a>
                                                     @endif
                                                 </td>
@@ -288,8 +304,8 @@
 
 @section('scripts')
     <script>
-        $(document).ready(function () {
-            setTimeout(function () {
+        $(document).ready(function() {
+            setTimeout(function() {
                 $('.alert').fadeOut('slow');
             }, 5000);
         });

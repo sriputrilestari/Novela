@@ -52,7 +52,16 @@
 }
 
 .hero-desc,
-.synopsis-text,
+.synopsis-text {
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.8;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
 .reader-content {
   margin-top: 14px;
   font-family: 'Crimson Pro', serif;
@@ -61,10 +70,21 @@
 }
 
 .hero-meta {
-  margin-top: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.hero-separator {
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+}
+
+.hero-stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
 
 .hero-stars {
@@ -288,9 +308,11 @@
 }
 
 .reader-wrap {
-  width: min(100%, 820px);
-  margin: 0 auto;
-  padding: 20px 16px 96px;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .reader-settings-panel {

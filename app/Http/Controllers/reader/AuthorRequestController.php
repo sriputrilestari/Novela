@@ -12,8 +12,6 @@ class AuthorRequestController extends Controller
     {
         $user = Auth::user();
         $genres = Genre::all();
-
-        // ✅ ambil genre
         $genres = Genre::orderBy('nama_genre')->get();
 
         return view('pages.authorrequest', [

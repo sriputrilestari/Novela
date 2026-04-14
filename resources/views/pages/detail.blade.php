@@ -35,9 +35,9 @@
                         @endfor
                         <span>{{ number_format($novel->rating, 1) }} ({{ $novel->total_rating }})</span>
                     </div>
-                    <div class="detail-stat">Views {{ number_format($novel->views) }}</div>
+                    <!-- <div class="detail-stat">Views {{ number_format($novel->views) }}</div> -->
                     <div class="detail-stat">Chapter {{ $chapters->count() }}</div>
-                    <div class="detail-stat">Favorit {{ $bookmarkCount }}</div>
+                    <!-- <div class="detail-stat">Favorit {{ $bookmarkCount }}</div> -->
                     <div class="detail-stat">Komentar {{ $commentCount }}</div>
                 </div>
 

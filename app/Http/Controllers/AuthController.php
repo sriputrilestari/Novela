@@ -71,7 +71,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect('/')->with('success', 'Registration successful! Welcome to Novela.');
+        return redirect('/')->with('success', 'Registrasi Berhasil! Selamat Datang di Novela');
     }
 
     // Logout

@@ -66,6 +66,13 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/comment', [CommentController::class, 'store']);
 
+    Route::post('/comment/{id}/like', [CommentController::class, 'like'])
+        ->name('comment.like');
+    Route::post('/reply', [CommentController::class, 'reply'])
+        ->name('comment.reply');
+    Route::post('/reply/{id}/like', [CommentController::class, 'likeReply'])
+        ->name('reply.like');
+
     Route::post('/bookmark/{novel_id}', [BookmarkController::class, 'toggle'])->name('bookmark.toggle');
     Route::get('/favorit', [BookmarkController::class, 'index'])->name('favorites');
 

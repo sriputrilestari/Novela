@@ -20,7 +20,7 @@ class NovelController extends Controller
         $publishedQuery = Novel::query()
             ->where('approval_status', 'published');
         $hasPublished = (clone $publishedQuery)->exists();
-        $baseQuery    = $hasPublished ? $publishedQuery : Novel::query();
+        $baseQuery    = $publishedQuery;
 
         $featured = (clone $baseQuery)
             ->orderByDesc('rating')
