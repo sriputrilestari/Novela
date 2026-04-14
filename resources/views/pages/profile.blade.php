@@ -39,7 +39,8 @@
                     <div style="font-size:.85rem; font-weight:600; margin-bottom:2px;">✍️ Ingin jadi penulis?</div>
                     <div style="font-size:.78rem; color:var(--text-muted);">Bagikan ceritamu kepada jutaan pembaca</div>
                 </div>
-                <a href="{{ route('reader.author-request') }}" class="pf-btn" style="white-space:nowrap;">🚀 Daftar</a>
+                <a href="{{route('reader.author-request');}}
+" class="pf-btn" style="white-space:nowrap;">🚀 Daftar</a>
             </div>
         @endif
 

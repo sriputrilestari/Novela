@@ -64,14 +64,11 @@ Route::get('/home', fn() => redirect('/'));
 // =============================================================================
 Route::middleware('auth')->group(function () {
 
-    // 💬 Comment
     Route::post('/comment', [CommentController::class, 'store']);
 
-    // ⭐ Bookmark
     Route::post('/bookmark/{novel_id}', [BookmarkController::class, 'toggle'])->name('bookmark.toggle');
     Route::get('/favorit', [BookmarkController::class, 'index'])->name('favorites');
 
-    // 📚 History
     Route::get('/history', [ReadingHistoryController::class, 'index'])->name('history');
     Route::post('/novel/{id}/report', [ReaderReportController::class, 'store'])->name('novel.report');
 });
@@ -117,7 +114,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/genres/{id}', [AdminGenreController::class, 'update'])->name('genre.update');
         Route::delete('/genres/{id}', [AdminGenreController::class, 'destroy'])->name('genre.destroy');
 
-        // ✅ Reports — lengkap
+        // REPORTS
         Route::get('reports', [AdminReportController::class, 'index'])->name('reports.index');
         Route::get('reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
         Route::post('reports/{report}/review', [AdminReportController::class, 'review'])->name('reports.review');
@@ -187,17 +184,13 @@ Route::middleware(['auth', 'role:reader'])
     ->name('reader.')
     ->group(function () {
 
-        // 🔥 Author Request
         Route::get('author-request', [AuthorRequestController::class, 'index'])->name('author-request');
         Route::post('author-request', [AuthorRequestController::class, 'submit'])->name('author-request.submit');
         Route::post('author-request/reapply', [AuthorRequestController::class, 'reapply'])->name('author-request.reapply');
         Route::post('author-request/cancel', [AuthorRequestController::class, 'cancel'])->name('author-request.cancel');
 
-        // 👤 Profile
         Route::get('profile', [ReaderProfileController::class, 'index'])->name('profile.index');
         Route::post('profile/update', [ReaderProfileController::class, 'update'])->name('profile.update');
         Route::post('profile/password', [ReaderProfileController::class, 'updatePassword'])->name('profile.password');
 
-        Route::get('/author-request', [AuthorRequestController::class, 'index'])
-            ->name('reader.author-request');
     });

@@ -11,6 +11,7 @@ class AuthorRequestController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $genres = Genre::all();
 
         // ✅ ambil genre
         $genres = Genre::orderBy('nama_genre')->get();
