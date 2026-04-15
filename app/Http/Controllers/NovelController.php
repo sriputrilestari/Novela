@@ -234,10 +234,12 @@ class NovelController extends Controller
             ->orderBy('urutan')
             ->first();
 
+        // ✅ Kalau tidak ada chapter → ke detail + buka tab chapter
         if (! $firstChapter) {
-            return back()->with('error', 'Novel ini belum memiliki chapter yang dipublikasikan.');
+            return redirect()->route('novel.show', $id) . '?tab=chapters';
         }
 
+        // ✅ Kalau ada → langsung ke reader (chapter pertama)
         return redirect()->route('chapter.show', $firstChapter->id);
     }
 

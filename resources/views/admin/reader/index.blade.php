@@ -239,13 +239,13 @@
                                             </a>
 
                                             {{-- Tombol Review (Hanya muncul jika pending) --}}
-                                            @if ($reader->author_request === 'pending')
+                                            {{-- @if ($reader->author_request === 'pending')
                                                 <a href="{{ route('admin.reader.show', $reader->id) }}"
                                                     class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
                                                     title="Review Pengajuan" style="width:32px; height:32px; padding:0;">
                                                     <i class="fas fa-clipboard-check"></i>
                                                 </a>
-                                            @endif
+                                            @endif --}}
 
                                             {{-- Tombol Blokir/Aktifkan --}}
                                             @php $aksi = $reader->is_active ? 'memblokir' : 'mengaktifkan'; @endphp

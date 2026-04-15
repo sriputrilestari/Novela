@@ -2,8 +2,12 @@
 @section('title', 'Novela - Beranda')
 
 @php
-    // Membagi data menjadi kelompok 5 untuk slider
-    $latestSlides = $latestNovels->chunk(5);
+    /** * 1. Pakai values() setelah sort supaya index-nya reset jadi 0, 1, 2...
+     * Ini kuncinya biar looping nomornya nggak loncat-loncat.
+     */
+    $sortedLatest = $latestNovels->sortByDesc('id')->values();
+    $latestSlides = $sortedLatest->chunk(5);
+
     $popularSlides = $popularNovels->chunk(5);
 
     $sections = [
@@ -26,17 +30,7 @@
 
 @section('content')
 
-    {{-- State jika semua data kosong --}}
-    @if (!$featured && $latestNovels->isEmpty() && $popularNovels->isEmpty())
-        <div
-            style="min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column;">
-            <div style="font-size: 40px; margin-bottom: 12px;">📚</div>
-            <h2 style="font-size: 22px; font-weight: 600; margin-bottom: 6px;">Belum Ada Novel</h2>
-            <p style="color: #aaa;">Saat ini belum ada novel yang dipublikasikan. ✨</p>
-        </div>
-    @endif
-
-    {{-- HERO SECTION (Novel Terpopuler/Rating Tertinggi) --}}
+    {{-- 1. HERO SECTION --}}
     @if ($featured)
         <section class="hero-home-shell">
             <div class="hero-banner hero-banner-home">
@@ -55,8 +49,7 @@
                                     class="novel-star {{ $i <= round($featured->rating ?? 0) ? 'star-filled' : 'star-empty' }}">★</span>
                             @endfor
                         </span>
-                        <span class="hero-rating">{{ number_format($featured->rating ?? 0, 1) }}
-                            ({{ $featured->total_rating ?? 0 }})</span>
+                        <span class="hero-rating">{{ number_format($featured->rating ?? 0, 1) }}</span>
                         <span class="hero-separator">•</span>
                         <span class="hero-tag">{{ $featured->genre->nama_genre ?? '-' }}</span>
                         <span class="hero-separator">•</span>
@@ -82,29 +75,42 @@
         </section>
     @endif
 
-    {{-- MAIN CONTENT (Slider Terbaru & Populer) --}}
+    {{-- 2. MAIN CONTENT (FIXED SLIDER & RANKING) --}}
     <div class="content-wrap content-wrap-home">
         @foreach ($sections as $section)
             @if ($section['slides']->isEmpty())
                 @continue
             @endif
 
-            <section class="novel-section novel-section-{{ $section['id'] }}">
+            <section class="novel-section">
                 <div class="section-header">
                     <div class="section-title">{{ $section['title'] }}</div>
-                    <a class="see-all" href="{{ $section['route'] }}">Lihat Semua →</a>
+
+                    <div class="slider-nav-controls" style="display: flex; align-items: center; gap: 15px;">
+                        <div class="arrows-wrap" style="display: flex; gap: 8px;">
+                            <button class="slider-arrow" onclick="manualSlide('{{ $section['id'] }}', -1)">❮</button>
+                            <button class="slider-arrow" onclick="manualSlide('{{ $section['id'] }}', 1)">❯</button>
+                        </div>
+                        <a class="see-all" href="{{ $section['route'] }}">Lihat Semua →</a>
+                    </div>
                 </div>
 
-                <div class="novel-slider" data-slider-root id="slider-{{ $section['id'] }}">
-                    <div class="novel-slider-window">
-                        <div class="novel-slider-track" data-slider-track>
-                            @foreach ($section['slides'] as $slide)
-                                <div class="novel-slide" data-slide>
-                                    <div class="novel-grid novel-grid-slider">
-                                        @foreach ($slide as $novel)
-                                            <div class="novel-card" data-novel-id="{{ $novel->id }}">
+                <div class="novel-slider" id="slider-{{ $section['id'] }}">
+                    <div class="novel-slider-window" style="overflow: hidden; width: 100%;">
+                        <div class="novel-slider-track" id="track-{{ $section['id'] }}"
+                            style="display: flex; transition: transform 0.5s ease-in-out;">
+                            @foreach ($section['slides'] as $slideIndex => $slide)
+                                <div class="novel-slide" style="min-width: 100%;">
+                                    <div class="novel-grid">
+                                        @foreach ($slide as $novelIndex => $novel)
+                                            <div class="novel-card">
                                                 <a href="{{ route('novel.show', $novel->id) }}" class="novel-cover-link">
                                                     <div class="novel-cover">
+                                                        {{-- NOMOR URUT: (Slide ke berapa * isi per slide) + (urutan item di slide itu) --}}
+                                                        <div class="novel-rank-badge">
+                                                            {{ $slideIndex * 5 + $loop->iteration }}
+                                                        </div>
+
                                                         @if ($novel->cover)
                                                             <img src="{{ asset('storage/' . ltrim($novel->cover, '/')) }}"
                                                                 alt="{{ $novel->judul }}" loading="lazy" />
@@ -144,15 +150,6 @@
                                                             <span>{{ $novel->total_rating ?? 0 }} rating</span>
                                                         @endif
                                                     </div>
-
-                                                    <button type="button" class="btn-rate-novel" data-rate-novel
-                                                        data-novel-id="{{ $novel->id }}"
-                                                        data-novel-title="{{ $novel->judul }}"
-                                                        data-novel-author="{{ $novel->author->name }}"
-                                                        data-cover-url="{{ $novel->cover ? asset('storage/' . ltrim($novel->cover, '/')) : '' }}"
-                                                        data-user-rating="{{ auth()->check() ? auth()->user()->ratings()->where('novel_id', $novel->id)->value('rating') ?? 0 : 0 }}">
-                                                        ★ Beri Rating
-                                                    </button>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -161,24 +158,74 @@
                             @endforeach
                         </div>
                     </div>
-
-                    @if ($section['slides']->count() > 1)
-                        <div class="novel-slider-controls">
-                            <button type="button" class="slider-arrow" data-prev>←</button>
-                            <div class="slider-dots">
-                                @foreach ($section['slides'] as $slideIndex => $unused)
-                                    <button type="button" class="slider-dot {{ $slideIndex === 0 ? 'active' : '' }}"
-                                        data-dot></button>
-                                @endforeach
-                            </div>
-                            <button type="button" class="slider-arrow" data-next>→</button>
-                        </div>
-                    @endif
                 </div>
             </section>
         @endforeach
     </div>
 
-    {{-- Modalnya tetap simpan di bawah (seperti codingan kamu sebelumnya) --}}
-    {{-- ... (lanjutkan kodingan modal & script kamu) --}}
+    <style>
+        .novel-cover {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .novel-rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.9);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 800;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Style khusus buat ranking 1 */
+        .novel-section:first-of-type .novel-slide:first-child .novel-card:first-child .novel-rank-badge {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        }
+
+        .slider-arrow {
+            background: #1e293b;
+            color: white;
+            border: 1px solid #334155;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 12px;
+        }
+
+        .slider-arrow:hover {
+            background: #475569;
+            border-color: #6366f1;
+        }
+    </style>
+
+    <script>
+        const sliderStates = {};
+
+        function manualSlide(sectionId, direction) {
+            const track = document.getElementById('track-' + sectionId);
+            if (!track) return;
+            const totalSlides = track.children.length;
+            if (!sliderStates[sectionId]) sliderStates[sectionId] = 0;
+            sliderStates[sectionId] += direction;
+            if (sliderStates[sectionId] >= totalSlides) sliderStates[sectionId] = 0;
+            if (sliderStates[sectionId] < 0) sliderStates[sectionId] = totalSlides - 1;
+            track.style.transform = `translateX(-${sliderStates[sectionId] * 100}%)`;
+        }
+    </script>
 @endsection

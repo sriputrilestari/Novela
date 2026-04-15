@@ -99,7 +99,7 @@
                     <p>Belum ada chapter.</p>
                 </div>
             @else
-                <div class="chapter-list">
+                <div class  = "chapter-list"style = "display:flex;flex-direction:column;gap:12px;">
                     @foreach ($chapters as $chapter)
                         <a href="{{ route('chapter.show', $chapter->id) }}" class="chapter-item">
                             <div class="chapter-num">{{ $chapter->urutan }}</div>
@@ -152,51 +152,57 @@
 @endsection
 
 @push('scripts')
-    <script>
-        const ratingContainer = document.querySelector('.rating-stars');
+<script>
+    const ratingContainer = document.querySelector('.rating-stars');
 
-        if (ratingContainer) {
-            const labels = Array.from(ratingContainer.querySelectorAll('.rating-star-option'));
-            const initialRating = Number(ratingContainer.dataset.initialRating || 0);
+    if (ratingContainer) {
+        const labels = Array.from(ratingContainer.querySelectorAll('.rating-star-option'));
+        const initialRating = Number(ratingContainer.dataset.initialRating || 0);
 
-            const paintStars = rating => {
-                labels.forEach((label, index) => {
-                    const icon = label.querySelector('.rating-star-icon');
-                    if (icon) {
-                        icon.textContent = index < rating ? '★' : '☆';
-                    }
-                });
-            };
-
-            const checkedInput = ratingContainer.querySelector('input[name="rating"]:checked');
-            paintStars(checkedInput ? Number(checkedInput.value) : initialRating);
-
+        const paintStars = rating => {
             labels.forEach((label, index) => {
-                const input = label.querySelector('input[name="rating"]');
-
-                label.addEventListener('mouseenter', () => paintStars(index + 1));
-                label.addEventListener('click', () => {
-                    if (!input) {
-                        return;
-                    }
-
-                    input.checked = true;
-                    paintStars(Number(input.value));
-                });
-            });
-
-            ratingContainer.addEventListener('mouseleave', () => {
-                const selectedInput = ratingContainer.querySelector('input[name="rating"]:checked');
-                paintStars(selectedInput ? Number(selectedInput.value) : initialRating);
-            });
-        }
-
-        document.querySelectorAll('.modal-overlay').forEach(el => {
-            el.addEventListener('click', e => {
-                if (e.target === el) {
-                    el.classList.remove('open');
+                const icon = label.querySelector('.rating-star-icon');
+                if (icon) {
+                    icon.textContent = index < rating ? '★' : '☆';
                 }
             });
+        };
+
+        const checkedInput = ratingContainer.querySelector('input[name="rating"]:checked');
+        paintStars(checkedInput ? Number(checkedInput.value) : initialRating);
+
+        labels.forEach((label, index) => {
+            const input = label.querySelector('input[name="rating"]');
+
+            label.addEventListener('mouseenter', () => paintStars(index + 1));
+            label.addEventListener('click', () => {
+                if (!input) return;
+                input.checked = true;
+                paintStars(Number(input.value));
+            });
         });
-    </script>
+
+        ratingContainer.addEventListener('mouseleave', () => {
+            const selectedInput = ratingContainer.querySelector('input[name="rating"]:checked');
+            paintStars(selectedInput ? Number(selectedInput.value) : initialRating);
+        });
+    }
+
+    // modal close
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => {
+            if (e.target === el) {
+                el.classList.remove('open');
+            }
+        });
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+
+    if (tab === 'chapters') {
+        const btn = document.querySelector('[onclick*="tab-chapters"]');
+        if (btn) btn.click();
+    }
+</script>
 @endpush
