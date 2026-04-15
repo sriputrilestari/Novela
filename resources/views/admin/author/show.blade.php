@@ -82,8 +82,9 @@
                                 <div class="text-xs text-muted text-uppercase">Views</div>
                             </div>
                             <div class="col-4">
+                                {{-- FIX: enum 'published' bukan 'approved' --}}
                                 <div class="h5 font-weight-bold text-gray-800 mb-0">
-                                    {{ $author->novels->where('approval_status', 'approved')->count() }}
+                                    {{ $author->novels->where('approval_status', 'published')->count() }}
                                 </div>
                                 <div class="text-xs text-muted text-uppercase">Approved</div>
                             </div>
@@ -183,7 +184,8 @@
                             <div class="card-body py-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approved</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {{ $author->novels->where('approval_status', 'approved')->count() }}
+                                    {{-- FIX: enum 'published' bukan 'approved' --}}
+                                    {{ $author->novels->where('approval_status', 'published')->count() }}
                                 </div>
                             </div>
                         </div>
@@ -247,22 +249,22 @@
                                                 <td class="align-middle text-center">
                                                     @php
                                                         $status = $novel->approval_status;
+                                                        {{-- FIX: enum pakai 'published' bukan 'approved' --}}
                                                         $badgeClass = match ($status) {
-                                                            'approved' => 'badge-success',
-                                                            'pending' => 'badge-warning',
-                                                            'rejected' => 'badge-danger',
-                                                            default => 'badge-secondary',
+                                                            'published' => 'badge-success',
+                                                            'pending'   => 'badge-warning',
+                                                            'rejected'  => 'badge-danger',
+                                                            default     => 'badge-secondary',
                                                         };
                                                         $icon = match ($status) {
-                                                            'approved' => 'check-circle',
-                                                            'pending' => 'clock',
-                                                            'rejected' => 'times-circle',
-                                                            default => 'question-circle',
+                                                            'published' => 'check-circle',
+                                                            'pending'   => 'clock',
+                                                            'rejected'  => 'times-circle',
+                                                            default     => 'question-circle',
                                                         };
                                                     @endphp
                                                     <span class="badge badge-pill {{ $badgeClass }} px-3 py-2">
-                                                        <i
-                                                            class="fas fa-{{ $icon }} mr-1"></i>{{ ucfirst($status) }}
+                                                        <i class="fas fa-{{ $icon }} mr-1"></i>{{ ucfirst($status) }}
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center">
@@ -273,11 +275,10 @@
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     @if (Route::has('admin.novels.show'))
-                                                         <a href = "{{ route('admin.novels.show', $novel->id) }}";
-                                                            class     = "btn btn-sm btn-info"title="Detail Novel" ;
-                                                            style     = "width:32px; height:32px; padding:0; line-height:32px;">
-                                                            <i class  = "fas fa-eye">
-                                                            </i>
+                                                        <a href="{{ route('admin.novels.show', $novel->id) }}"
+                                                            class="btn btn-sm btn-info" title="Detail Novel"
+                                                            style="width:32px; height:32px; padding:0; line-height:32px;">
+                                                            <i class="fas fa-eye"></i>
                                                         </a>
                                                     @endif
                                                 </td>
