@@ -229,33 +229,38 @@
                                     <td class="align-middle text-center small text-muted">
                                         {{ $reader->created_at?->format('d M Y') ?? '-' }}
                                     </td>
-                                    <td class="align-middle text-center">
-                                        <a href="{{ route('admin.reader.show', $reader->id) }}"
-                                            class="btn btn-sm btn-info" title="Detail"
-                                            style="width:32px; height:32px; padding:0; line-height:32px;">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-
-                                        @if ($reader->author_request === 'pending')
+                                    <td class="align-middle">
+                                        <div class="d-flex justify-content-center align-items-center" style="gap: 5px;">
+                                            {{-- Tombol Detail --}}
                                             <a href="{{ route('admin.reader.show', $reader->id) }}"
-                                                class="btn btn-sm btn-warning" title="Review Pengajuan"
-                                                style="width:32px; height:32px; padding:0; line-height:32px;">
-                                                <i class="fas fa-clipboard-check"></i>
+                                                class="btn btn-sm btn-info d-flex align-items-center justify-content-center"
+                                                title="Detail" style="width:32px; height:32px; padding:0;">
+                                                <i class="fas fa-eye"></i>
                                             </a>
-                                        @endif
 
-                                        @php $aksi = $reader->is_active ? 'memblokir' : 'mengaktifkan'; @endphp
-                                        <form action="{{ route('admin.reader.block', $reader->id) }}" method="POST"
-                                            class="d-inline"
-                                            onsubmit="return confirm('Yakin ingin {{ $aksi }} reader ini?')">
-                                            @csrf
-                                            <button type="submit"
-                                                class="btn btn-sm {{ $reader->is_active ? 'btn-danger' : 'btn-success' }}"
-                                                title="{{ $reader->is_active ? 'Blokir' : 'Aktifkan' }}"
-                                                style="width:32px; height:32px; padding:0; line-height:32px;">
-                                                <i class="fas fa-{{ $reader->is_active ? 'ban' : 'check' }}"></i>
-                                            </button>
-                                        </form>
+                                            {{-- Tombol Review (Hanya muncul jika pending) --}}
+                                            @if ($reader->author_request === 'pending')
+                                                <a href="{{ route('admin.reader.show', $reader->id) }}"
+                                                    class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
+                                                    title="Review Pengajuan" style="width:32px; height:32px; padding:0;">
+                                                    <i class="fas fa-clipboard-check"></i>
+                                                </a>
+                                            @endif
+
+                                            {{-- Tombol Blokir/Aktifkan --}}
+                                            @php $aksi = $reader->is_active ? 'memblokir' : 'mengaktifkan'; @endphp
+                                            <form action="{{ route('admin.reader.block', $reader->id) }}" method="POST"
+                                                class="m-0"
+                                                onsubmit="return confirm('Yakin ingin {{ $aksi }} reader ini?')">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="btn btn-sm {{ $reader->is_active ? 'btn-danger' : 'btn-success' }} d-flex align-items-center justify-content-center"
+                                                    title="{{ $reader->is_active ? 'Blokir' : 'Aktifkan' }}"
+                                                    style="width:32px; height:32px; padding:0;">
+                                                    <i class="fas fa-{{ $reader->is_active ? 'ban' : 'check' }}"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
