@@ -7,27 +7,23 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // 1. Ambil Hero dulu (Rating tertinggi)
+        // 1. Ambil Hero (Featured) - Berdasarkan rating tertinggi
         $featured = Novel::with(['author', 'genre'])
             ->withCount('chapters')
             ->where('approval_status', 'approved')
             ->orderByDesc('rating')
-            ->orderByDesc('created_at') // Cadangan jika rating sama
+            ->orderByDesc('id')
             ->first();
 
-        // Ambil ID featured supaya tidak muncul lagi di list bawah (opsional)
-        $featuredId = $featured ? $featured->id : null;
-
-        // 2. Novel Terbaru (Urutkan berdasarkan ID agar pasti yang paling baru di atas)
+        // 2. Novel Terbaru - Urutkan berdasarkan ID DESC (Paling baru di paling awal)
         $latestNovels = Novel::with(['author', 'genre'])
             ->withCount('chapters')
-            ->where('approval_status', 'approved')
-                            // ->where('id', '!=', $featuredId) // Hilangkan comment jika tak ingin duplikat dengan Hero
-            ->orderByDesc('id') // Menggunakan ID lebih akurat dibanding created_at untuk deadline
-            ->take(15)          // Batasi agar web tidak berat
+            ->where('approval_status', 'approved') // Pastikan status di DB adalah 'approved'
+            ->orderByDesc('id')
+            ->take(15)
             ->get();
 
-        // 3. Novel Populer
+        // 3. Novel Populer - Berdasarkan jumlah views
         $popularNovels = Novel::with(['author', 'genre'])
             ->withCount('chapters')
             ->where('approval_status', 'approved')
@@ -35,7 +31,7 @@ class HomeController extends Controller
             ->take(15)
             ->get();
 
-        // 4. Reading History
+        // 4. Riwayat Membaca (Jika sudah login)
         $readingHistory = auth()->check()
             ? auth()->user()->readingHistory()
             ->with('chapter.novel.genre')
@@ -54,7 +50,6 @@ class HomeController extends Controller
 
     public function show($id)
     {
-        // Gunakan with untuk performa lebih cepat saat load detail
         $novel = Novel::with(['author', 'genre', 'chapters'])->findOrFail($id);
         return view('novel.show', compact('novel'));
     }
